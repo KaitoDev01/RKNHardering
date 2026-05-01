@@ -2,6 +2,7 @@ import org.gradle.api.GradleException
 
 plugins {
     alias(libs.plugins.android.application)
+    alias(libs.plugins.kotlin.android)
 }
 
 val nativeNdkVersion = "28.2.13676358"
@@ -74,6 +75,9 @@ android {
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11
+    }
+    kotlinOptions {
+        jvmTarget = "11"
     }
     buildFeatures {
         buildConfig = true

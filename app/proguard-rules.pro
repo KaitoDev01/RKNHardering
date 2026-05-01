@@ -19,3 +19,7 @@
 # If you keep the line number information, uncomment this to
 # hide the original source file name.
 #-renamesourcefileattribute SourceFile
+
+# Keep Application class from being removed during R8/minification
+-keep class com.notcvnt.rknhardering.RknHarderingApp { *; }
+-keep class * extends android.app.Application { *; }

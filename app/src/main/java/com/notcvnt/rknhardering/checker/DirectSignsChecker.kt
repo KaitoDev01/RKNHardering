@@ -709,8 +709,8 @@ object DirectSignsChecker {
 
             val hasDnsPathMismatch = comparison?.dnsPathMismatch == true
             if (hasDnsPathMismatch) {
-                val transportOnly = comparison.usedCurlCompatibleFallback() &&
-                    comparison.curlCompatible.transportDiagnostics.resolveStrategy != TunProbeResolveStrategy.KOTLIN_INJECTED
+                val transportOnly = comparison!!.usedCurlCompatibleFallback() &&
+                    comparison!!.curlCompatible!!.transportDiagnostics.resolveStrategy != TunProbeResolveStrategy.KOTLIN_INJECTED
                 val confidence = if (transportOnly) EvidenceConfidence.MEDIUM else EvidenceConfidence.HIGH
                 evidence.add(
                     EvidenceItem(
