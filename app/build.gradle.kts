@@ -15,8 +15,8 @@ android {
         applicationId = "com.notcvnt.rknhardering"
         minSdk = 26
         targetSdk = 36
-        versionCode = 20610
-        versionName = "2.6.10"
+        versionCode = 20611
+        versionName = "2.6.11"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         androidResources.localeFilters += listOf("en", "ru", "fa", "zh-rCN")
 
