@@ -2,7 +2,7 @@
     <string name="app_name">RKNHardering</string>
     <string name="github_repo_url">https://github.com/xtclovver/RKNHardering</string>
     <string name="matrix_room_url">https://matrix.to/#/%23RKN_Hardering:matrix.kangel.tech</string>
-    <string name="run_check_notice">执行检查时，应用会向以下域名发起网络请求：\n• api.beacondb.net\n• api.ipapi.is\n• www.iplocate.io\n• ip.mail.ru\n• api4.ipify.org\n• api6.ipify.org\n• 2ip.ru\n• ipv4-internet.yandex.net\n• ipv6-internet.yandex.net\n• ifconfig.me\n• ipv4.ifconfig.me\n• ipv6.ifconfig.me\n• checkip.amazonaws.com\n• api.ipify.org\n• api-ipv4.ip.sb\n• api-ipv6.ip.sb\n\n如果在设置中选择了自定义 DNS resolver，应用还会连接到其 IP 地址或 DoH 域名。\n\n如果启用了 CDN pulling，应用还会向 redirector.googlevideo.com、rutracker.org 和 meduza.io 发送 HTTPS 请求，以查看这些端点会返回什么公网 IP 和 trace 数据。\n\n如果启用了 call transport 泄露检查，应用还会向内置的 Telegram 目标发送 UDP/STUN 请求。WhatsApp 目标只会在 debug 或 experimental build 中使用。\n\n如果启用了 Debug diagnostics，应用还可以基于最近一次已完成的检查生成可复制的诊断报告，即使这次检查成功完成也一样。该报告只保存在内存中，直到你复制它，并且也会包含 CDN pulling 的响应。\n\n点击“运行检查”即表示你同意这些网络请求将从你的设备发出。\n\n应用不会记录这些请求的日志。可以在应用设置中关闭网络访问。</string>
+    <string name="run_check_notice">执行检查时，根据已启用的检查和权限，应用可能会向以下 endpoint 发起网络请求：\n• api.beacondb.net\n• api.ipapi.is\n• www.iplocate.io\n• ip.mail.ru\n• api4.ipify.org\n• api6.ipify.org\n• 2ip.ru\n• ipv4-internet.yandex.net\n• ipv6-internet.yandex.net\n• api.sypexgeo.net\n• ifconfig.me\n• checkip.amazonaws.com\n• api.ipify.org\n• api-ipv4.ip.sb\n• api-ipv6.ip.sb\n\n如果启用了 split tunnel bypass、本地 proxy 扫描或 Xray API 扫描，应用可能会连接本地 loopback endpoint：\n• 127.0.0.1 上的已选端口\n• ::1 上的已选端口\n常用端口扫描包含 1080、1081、1443、2080、2081、3067、7890、7891、8080、10085、10808、10809 和 12334；完整扫描使用设置中的端口范围。\n\n如果选择了预设 DNS resolver，应用还可能连接到以下 DNS endpoint：\n• 1.1.1.1\n• 1.0.0.1\n• 8.8.8.8\n• 8.8.4.4\n• 77.88.8.8\n• 77.88.8.1\n• cloudflare-dns.com\n• dns.google\n• common.dot.dns.yandex.net\n\n如果选择了自定义 DNS resolver，应用还可能连接到用户输入的 IP 地址或 DoH 域名。\n\n如果启用了 CDN pulling，应用还会向以下 endpoint 发送 HTTPS 请求：\n• redirector.googlevideo.com\n• www.cloudflare.com\n• one.one.one.one\n• rutracker.org\n• meduza.io\n\n如果启用了 call transport 泄露检查，应用还会向以下 endpoint 发送 UDP/STUN 请求：\n• stun.fitauto.ru:3478\n• stun.sberbank.ru:3478\n• stun.l.google.com:19302\n• stun1.l.google.com:19302\n• stun2.l.google.com:19302\n• stun3.l.google.com:19302\n• stun4.l.google.com:19302\n• stun.cloudflare.com:3478\n• global.stun.twilio.com:3478\n• stun.nextcloud.com:443\n• stun.sipgate.net:3478\n• stun.voip.blackberry.com:3478\n• stun.voipgate.com:3478\n• stun.antisip.com:3478\n• stun.sip.us:3478\n• stun.1und1.de:3478\n• stun.voipbuster.com:3478\n• stun.counterpath.net:3478\n• stun.ekiga.net:3478\n• stun.stunprotocol.org:3478\n• stun.schlund.de:3478\n• stun.linphone.org:3478\n\n对于 proxy-assisted Telegram MTProto 检查，应用可能会让本地 SOCKS5 代理连接到：\n• 149.154.167.51:443\n• 149.154.167.41:443\n\n如果启用了 ICMP spoofing 检测，应用还会对以下目标执行 DNS resolve 和 ping：\n• instagram.com\n• google.com\n\n如果启用了更新检查，应用可能会连接 api.github.com。\n\n如果启用了 Debug diagnostics，应用还可以基于最近一次已完成的检查生成可复制的诊断报告，即使这次检查成功完成也一样。该报告只保存在内存中，直到你复制它，并且也会包含 CDN pulling 的响应。\n\n点击“运行检查”即表示你同意这些网络请求将从你的设备发出。\n\n应用不会记录这些请求的日志。可以在应用设置中关闭网络访问。</string>
 
     <string name="settings_title">设置</string>
     <string name="settings_section_checks">检查</string>
@@ -54,14 +54,14 @@
     <string name="settings_network_requests">网络请求</string>
     <string name="settings_network_requests_desc">GeoIP、IP 比较、CDN pulling、BeaconDB、call transport 检查</string>
     <string name="settings_auto_update">更新检查</string>
-    <string name="settings_auto_update_desc">检查 GitHub Releases，并提示下载更新的 APK。</string>
+    <string name="settings_auto_update_desc">通过 api.github.com 检查 GitHub Releases，并提示下载更新的 APK。</string>
     <string name="settings_network_disable_title">要禁用网络请求吗？</string>
     <string name="settings_network_disable_message">禁用后：\n\n• GeoIP 检查将不会运行\n• 通过外部服务进行的 IP 比较将被禁用\n• CDN pulling 检查将被禁用\n• 通过 BeaconDB（基站/Wi-Fi）进行的位置判断将被禁用\n• Call transport 泄露探测将被禁用\n\n届时只保留本地检查：直接迹象、间接迹象和端口扫描</string>
     <string name="settings_network_disable_confirm">禁用</string>
     <string name="settings_cdn_pulling">CDN pulling</string>
     <string name="settings_cdn_pulling_desc">向 Google/YouTube redirector 和 Cloudflare trace 端点发送 HTTPS 请求。</string>
     <string name="settings_cdn_pulling_warning_title">启用 CDN pulling？</string>
-    <string name="settings_cdn_pulling_warning_message">应用会向 Google/YouTube、rutracker.org 和 meduza.io 发送普通网页请求。这些网站可能看到你设备的公网 IP，并返回国家、数据中心或代理模式等简短网络信息。</string>
+    <string name="settings_cdn_pulling_warning_message">应用会向 Google/YouTube、www.cloudflare.com、one.one.one.one、rutracker.org 和 meduza.io 发送普通网页请求。这些网站可能看到你设备的公网 IP，并返回国家、数据中心或代理模式等简短网络信息。</string>
     <string name="settings_cdn_pulling_warning_confirm">启用</string>
     <string name="settings_cdn_pulling_meduza">包含 meduza.io</string>
     <string name="settings_cdn_pulling_meduza_desc">在 CDN pulling 过程中向 meduza.io/cdn-cgi/trace 发送请求。</string>
@@ -518,7 +518,7 @@
     <string name="verdict_subtitle_running">正在检查\u2026</string>
     <string name="verdict_subtitle_done">检查完成 \u00b7 %1$d 个类别</string>
     <string name="section_check_details">检查详情</string>
-    <string name="privacy_footer_text">检查在本地运行 \u00b7 16 个域名</string>
+    <string name="privacy_footer_text">检查在本地运行 \u00b7 网络端点已列出</string>
     <string name="privacy_footer_action">这是什么？</string>
     <string name="tile_hint_placeholder">\u2014</string>
     <string name="tile_hint_loading">检查中\u2026</string>
@@ -580,7 +580,7 @@
     <string name="update_dialog_skip">跳过此版本</string>
     <string name="update_dialog_later">稍后</string>
     <string name="auto_update_onboarding_title">启用更新检查？</string>
-    <string name="auto_update_onboarding_message">首次启动时，应用可以检查 GitHub Releases 是否有更新的 APK。如果你现在禁用它，在你手动到网络设置中重新开启之前，应用不会执行这项检查。</string>
+    <string name="auto_update_onboarding_message">首次启动时，应用可以连接 api.github.com 来检查 GitHub Releases 是否有更新的 APK。如果你现在禁用它，在你手动到网络设置中重新开启之前，应用不会执行这项检查。</string>
     <string name="auto_update_onboarding_enable">启用</string>
     <string name="auto_update_onboarding_disable">不要启用</string>
 </resources>

@@ -2,7 +2,7 @@
     <string name="app_name">RKNHardering</string>
     <string name="github_repo_url">https://github.com/xtclovver/RKNHardering</string>
     <string name="matrix_room_url">https://matrix.to/#/%23RKN_Hardering:matrix.kangel.tech</string>
-    <string name="run_check_notice">در زمان اجرای بررسی، برنامه به این دامنه‌ها درخواست شبکه ارسال می‌کند:\n• api.beacondb.net\n• api.ipapi.is\n• www.iplocate.io\n• ip.mail.ru\n• api4.ipify.org\n• api6.ipify.org\n• 2ip.ru\n• ipv4-internet.yandex.net\n• ipv6-internet.yandex.net\n• ifconfig.me\n• ipv4.ifconfig.me\n• ipv6.ifconfig.me\n• checkip.amazonaws.com\n• api.ipify.org\n• api-ipv4.ip.sb\n• api-ipv6.ip.sb\n\nاگر در تنظیمات یک DNS resolver سفارشی انتخاب شده باشد، برنامه همچنین به آدرس‌های IP آن یا دامنه DoH متصل می‌شود.\n\nاگر CDN pulling فعال باشد، برنامه علاوه بر این به redirector.googlevideo.com و نیز rutracker.org و meduza.io درخواست HTTPS می‌فرستد تا ببیند این endpointها چه IP عمومی و داده‌های trace برمی‌گردانند.\n\nاگر بررسی نشت call transport فعال باشد، برنامه علاوه بر این درخواست‌های UDP/STUN را به هدف‌های Telegram که همراه برنامه هستند می‌فرستد. هدف‌های WhatsApp فقط در buildهای debug یا experimental استفاده می‌شوند.\n\nاگر Debug diagnostics فعال باشد، برنامه می‌تواند از آخرین بررسی تکمیل‌شده یک گزارش تشخیصی قابل کپی بسازد، حتی اگر بررسی با موفقیت تمام شده باشد. این گزارش فقط تا زمان کپی شدن در حافظه نگه داشته می‌شود و پاسخ‌های CDN pulling را هم شامل می‌شود.\n\nبا لمس دکمه «اجرای بررسی»، موافقت می‌کنید که این درخواست‌های شبکه از دستگاه شما ارسال شوند.\n\nبرنامه لاگ این درخواست‌ها را نگه نمی‌دارد. دسترسی به شبکه را می‌توان از تنظیمات برنامه غیرفعال کرد.</string>
+    <string name="run_check_notice">در زمان اجرای بررسی، بسته به بررسی‌ها و مجوزهای فعال، برنامه می‌تواند به این endpointها درخواست شبکه ارسال کند:\n• api.beacondb.net\n• api.ipapi.is\n• www.iplocate.io\n• ip.mail.ru\n• api4.ipify.org\n• api6.ipify.org\n• 2ip.ru\n• ipv4-internet.yandex.net\n• ipv6-internet.yandex.net\n• api.sypexgeo.net\n• ifconfig.me\n• checkip.amazonaws.com\n• api.ipify.org\n• api-ipv4.ip.sb\n• api-ipv6.ip.sb\n\nاگر split tunnel bypass، اسکن proxy محلی یا اسکن Xray API فعال باشد، برنامه می‌تواند به endpointهای loopback محلی متصل شود:\n• 127.0.0.1 روی پورت‌های انتخاب‌شده\n• ::1 روی پورت‌های انتخاب‌شده\nاسکن پورت‌های رایج شامل 1080، 1081، 1443، 2080، 2081، 3067، 7890، 7891، 8080، 10085، 10808، 10809 و 12334 است؛ اسکن کامل از بازه تنظیم‌شده استفاده می‌کند.\n\nاگر DNS resolver آماده انتخاب شده باشد، برنامه همچنین می‌تواند به این endpointهای DNS متصل شود:\n• 1.1.1.1\n• 1.0.0.1\n• 8.8.8.8\n• 8.8.4.4\n• 77.88.8.8\n• 77.88.8.1\n• cloudflare-dns.com\n• dns.google\n• common.dot.dns.yandex.net\n\nاگر DNS resolver سفارشی انتخاب شده باشد، برنامه همچنین می‌تواند به IP آدرس‌ها یا دامنه DoH واردشده توسط کاربر متصل شود.\n\nاگر CDN pulling فعال باشد، برنامه علاوه بر این به این endpointها درخواست HTTPS می‌فرستد:\n• redirector.googlevideo.com\n• www.cloudflare.com\n• one.one.one.one\n• rutracker.org\n• meduza.io\n\nاگر بررسی نشت call transport فعال باشد، برنامه علاوه بر این درخواست‌های UDP/STUN را به این endpointها می‌فرستد:\n• stun.fitauto.ru:3478\n• stun.sberbank.ru:3478\n• stun.l.google.com:19302\n• stun1.l.google.com:19302\n• stun2.l.google.com:19302\n• stun3.l.google.com:19302\n• stun4.l.google.com:19302\n• stun.cloudflare.com:3478\n• global.stun.twilio.com:3478\n• stun.nextcloud.com:443\n• stun.sipgate.net:3478\n• stun.voip.blackberry.com:3478\n• stun.voipgate.com:3478\n• stun.antisip.com:3478\n• stun.sip.us:3478\n• stun.1und1.de:3478\n• stun.voipbuster.com:3478\n• stun.counterpath.net:3478\n• stun.ekiga.net:3478\n• stun.stunprotocol.org:3478\n• stun.schlund.de:3478\n• stun.linphone.org:3478\n\nبرای بررسی proxy-assisted Telegram MTProto، برنامه می‌تواند از SOCKS5 proxy محلی بخواهد به این مقصدها وصل شود:\n• 149.154.167.51:443\n• 149.154.167.41:443\n\nاگر تشخیص جعل ICMP فعال باشد، برنامه علاوه بر این DNS resolve و ping را برای این مقصدها انجام می‌دهد:\n• instagram.com\n• google.com\n\nاگر بررسی به‌روزرسانی فعال باشد، برنامه می‌تواند به api.github.com متصل شود.\n\nاگر Debug diagnostics فعال باشد، برنامه می‌تواند از آخرین بررسی تکمیل‌شده یک گزارش تشخیصی قابل کپی بسازد، حتی اگر بررسی با موفقیت تمام شده باشد. این گزارش فقط تا زمان کپی شدن در حافظه نگه داشته می‌شود و پاسخ‌های CDN pulling را هم شامل می‌شود.\n\nبا لمس دکمه «اجرای بررسی»، موافقت می‌کنید که این درخواست‌های شبکه از دستگاه شما ارسال شوند.\n\nبرنامه لاگ این درخواست‌ها را نگه نمی‌دارد. دسترسی به شبکه را می‌توان از تنظیمات برنامه غیرفعال کرد.</string>
 
     <string name="settings_title">تنظیمات</string>
     <string name="settings_section_checks">بررسی‌ها</string>
@@ -54,14 +54,14 @@
     <string name="settings_network_requests">درخواست‌های شبکه</string>
     <string name="settings_network_requests_desc">GeoIP، مقایسه IP، CDN pulling، BeaconDB، بررسی call transport</string>
     <string name="settings_auto_update">بررسی به‌روزرسانی‌ها</string>
-    <string name="settings_auto_update_desc">نسخه‌های GitHub Releases را بررسی می‌کند و دانلود APK جدیدتر را پیشنهاد می‌دهد.</string>
+    <string name="settings_auto_update_desc">GitHub Releases را از طریق api.github.com بررسی می‌کند و دانلود APK جدیدتر را پیشنهاد می‌دهد.</string>
     <string name="settings_network_disable_title">درخواست‌های شبکه غیرفعال شوند؟</string>
     <string name="settings_network_disable_message">در صورت غیرفعال شدن:\n\n• بررسی‌های GeoIP اجرا نخواهند شد\n• مقایسه IP از طریق سرویس‌های خارجی غیرفعال می‌شود\n• بررسی CDN pulling غیرفعال می‌شود\n• مکان‌یابی از طریق BeaconDB (دکل‌ها/Wi-Fi) غیرفعال می‌شود\n• بررسی نشت call transport غیرفعال می‌شود\n\nفقط بررسی‌های محلی باقی می‌مانند: نشانه‌های مستقیم، نشانه‌های غیرمستقیم و اسکن پورت</string>
     <string name="settings_network_disable_confirm">غیرفعال کردن</string>
     <string name="settings_cdn_pulling">CDN pulling</string>
     <string name="settings_cdn_pulling_desc">درخواست HTTPS به Google/YouTube redirector و Cloudflare trace endpoints می‌فرستد.</string>
     <string name="settings_cdn_pulling_warning_title">CDN pulling فعال شود؟</string>
-    <string name="settings_cdn_pulling_warning_message">برنامه درخواست‌های معمول وب را به Google/YouTube، rutracker.org و meduza.io می‌فرستد. این سایت‌ها می‌توانند IP عمومی دستگاه شما را ببینند و داده‌های کوتاه شبکه مثل کشور، دیتاسنتر یا حالت پروکسی را برگردانند.</string>
+    <string name="settings_cdn_pulling_warning_message">برنامه درخواست‌های معمول وب را به Google/YouTube، www.cloudflare.com، one.one.one.one، rutracker.org و meduza.io می‌فرستد. این سایت‌ها می‌توانند IP عمومی دستگاه شما را ببینند و داده‌های کوتاه شبکه مثل کشور، دیتاسنتر یا حالت پروکسی را برگردانند.</string>
     <string name="settings_cdn_pulling_warning_confirm">فعال کردن</string>
     <string name="settings_cdn_pulling_meduza">meduza.io را شامل کن</string>
     <string name="settings_cdn_pulling_meduza_desc">یک درخواست به meduza.io/cdn-cgi/trace به عنوان بخشی از CDN pulling ارسال کنید.</string>
@@ -520,7 +520,7 @@
     <string name="verdict_subtitle_running">بررسی در حال اجراست\u2026</string>
     <string name="verdict_subtitle_done">بررسی تکمیل شد \u00b7 %1$d دسته</string>
     <string name="section_check_details">جزئیات بررسی</string>
-    <string name="privacy_footer_text">بررسی به‌صورت محلی اجرا می‌شود \u00b7 ۱۶ دامنه</string>
+    <string name="privacy_footer_text">بررسی به‌صورت محلی اجرا می‌شود \u00b7 نشانی‌های شبکه فهرست شده‌اند</string>
     <string name="privacy_footer_action">این چیست؟</string>
     <string name="tile_hint_placeholder">\u2014</string>
     <string name="tile_hint_loading">در حال بررسی\u2026</string>
@@ -582,7 +582,7 @@
     <string name="update_dialog_skip">رد کردن این نسخه</string>
     <string name="update_dialog_later">بعداً</string>
     <string name="auto_update_onboarding_title">بررسی به‌روزرسانی‌ها فعال شود؟</string>
-    <string name="auto_update_onboarding_message">در اولین اجرا، برنامه می‌تواند GitHub Releases را برای یافتن APK جدیدتر بررسی کند. اگر اکنون آن را غیرفعال کنید، این بررسی تا وقتی که خودتان آن را در تنظیمات شبکه فعال نکنید انجام نخواهد شد.</string>
+    <string name="auto_update_onboarding_message">در اولین اجرا، برنامه می‌تواند برای بررسی GitHub Releases و یافتن APK جدیدتر به api.github.com متصل شود. اگر اکنون آن را غیرفعال کنید، این بررسی تا وقتی که خودتان آن را در تنظیمات شبکه فعال نکنید انجام نخواهد شد.</string>
     <string name="auto_update_onboarding_enable">فعال کردن</string>
     <string name="auto_update_onboarding_disable">فعال نکن</string>
 </resources>

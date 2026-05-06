@@ -2,7 +2,7 @@
     <string name="app_name">RKNHardering</string>
     <string name="github_repo_url">https://github.com/xtclovver/RKNHardering</string>
     <string name="matrix_room_url">https://matrix.to/#/%23RKN_Hardering:matrix.kangel.tech</string>
-    <string name="run_check_notice">During a check, the app will make network requests to these domains:\n• api.beacondb.net\n• api.ipapi.is\n• www.iplocate.io\n• ip.mail.ru\n• api4.ipify.org\n• api6.ipify.org\n• 2ip.ru\n• ipv4-internet.yandex.net\n• ipv6-internet.yandex.net\n• ifconfig.me\n• ipv4.ifconfig.me\n• ipv6.ifconfig.me\n• checkip.amazonaws.com\n• api.ipify.org\n• api-ipv4.ip.sb\n• api-ipv6.ip.sb\n\nIf a custom DNS resolver is selected in settings, the app will also connect to its IP addresses or DoH domain.\n\nIf CDN pulling is enabled, the app may additionally send HTTPS requests to redirector.googlevideo.com, rutracker.org, and meduza.io to see what public IP and trace data these endpoints return.\n\nIf Call transport leak probe is enabled, the app may additionally send UDP/STUN requests to bundled Telegram targets. WhatsApp targets are used only in debug or experimental builds.\n\nIf ICMP spoofing detection is enabled, the app may additionally resolve and ping instagram.com and google.com to compare blocked-host reachability and suspiciously low RTT values.\n\nIf Debug diagnostics is enabled, the app can also prepare a copyable diagnostics report from the last completed scan, even when the scan finished successfully. That report is kept only in memory until you copy it. CDN pulling responses are included in that report.\n\nBy tapping "Run check", you agree that these network requests will be made from your device.\n\nThe app does not keep logs of these requests. Network access can be disabled in the app settings.</string>
+    <string name="run_check_notice">During a check, depending on enabled checks and permissions, the app may make network requests to these endpoints:\n• api.beacondb.net\n• api.ipapi.is\n• www.iplocate.io\n• ip.mail.ru\n• api4.ipify.org\n• api6.ipify.org\n• 2ip.ru\n• ipv4-internet.yandex.net\n• ipv6-internet.yandex.net\n• api.sypexgeo.net\n• ifconfig.me\n• checkip.amazonaws.com\n• api.ipify.org\n• api-ipv4.ip.sb\n• api-ipv6.ip.sb\n\nIf split tunnel bypass, local proxy scan, or Xray API scan is enabled, the app may connect to local loopback endpoints:\n• 127.0.0.1 on selected ports\n• ::1 on selected ports\nPopular scans include ports 1080, 1081, 1443, 2080, 2081, 3067, 7890, 7891, 8080, 10085, 10808, 10809, and 12334; full scans use the configured range.\n\nIf a preset DNS resolver is selected, the app may also connect to these DNS endpoints:\n• 1.1.1.1\n• 1.0.0.1\n• 8.8.8.8\n• 8.8.4.4\n• 77.88.8.8\n• 77.88.8.1\n• cloudflare-dns.com\n• dns.google\n• common.dot.dns.yandex.net\n\nIf a custom DNS resolver is selected, the app may also connect to its user-entered IP addresses or DoH domain.\n\nIf CDN pulling is enabled, the app may additionally send HTTPS requests to these endpoints:\n• redirector.googlevideo.com\n• www.cloudflare.com\n• one.one.one.one\n• rutracker.org\n• meduza.io\n\nIf Call transport leak probe is enabled, the app may additionally send UDP/STUN requests to these endpoints:\n• stun.fitauto.ru:3478\n• stun.sberbank.ru:3478\n• stun.l.google.com:19302\n• stun1.l.google.com:19302\n• stun2.l.google.com:19302\n• stun3.l.google.com:19302\n• stun4.l.google.com:19302\n• stun.cloudflare.com:3478\n• global.stun.twilio.com:3478\n• stun.nextcloud.com:443\n• stun.sipgate.net:3478\n• stun.voip.blackberry.com:3478\n• stun.voipgate.com:3478\n• stun.antisip.com:3478\n• stun.sip.us:3478\n• stun.1und1.de:3478\n• stun.voipbuster.com:3478\n• stun.counterpath.net:3478\n• stun.ekiga.net:3478\n• stun.stunprotocol.org:3478\n• stun.schlund.de:3478\n• stun.linphone.org:3478\n\nFor proxy-assisted Telegram MTProto probing, the app may ask a local SOCKS5 proxy to connect to:\n• 149.154.167.51:443\n• 149.154.167.41:443\n\nIf ICMP spoofing detection is enabled, the app may additionally resolve and ping:\n• instagram.com\n• google.com\n\nIf update checks are enabled, the app may contact api.github.com.\n\nIf Debug diagnostics is enabled, the app can also prepare a copyable diagnostics report from the last completed scan, even when the scan finished successfully. That report is kept only in memory until you copy it. CDN pulling responses are included in that report.\n\nBy tapping "Run check", you agree that these network requests will be made from your device.\n\nThe app does not keep logs of these requests. Network access can be disabled in the app settings.</string>
     <string name="settings_title">Settings</string>
     <string name="settings_section_checks">Checks</string>
     <string name="settings_section_privacy">Privacy</string>
@@ -53,13 +53,13 @@
     <string name="settings_network_requests">Network requests</string>
     <string name="settings_network_requests_desc">GeoIP, IP comparison, CDN pulling, BeaconDB, call transport probe, ICMP spoofing</string>
     <string name="settings_auto_update">Update checks</string>
-    <string name="settings_auto_update_desc">Checks GitHub Releases and offers to download a newer APK.</string>
+    <string name="settings_auto_update_desc">Checks api.github.com for GitHub Releases and offers to download a newer APK.</string>
     <string name="settings_network_disable_title">Disable network requests?</string>
     <string name="settings_network_disable_message">If disabled:\n\n• GeoIP checks will not run\n• IP address comparison via external services will be disabled\n• CDN pulling checks will be disabled\n• Geolocation via BeaconDB (cell towers/Wi-Fi) will be disabled\n• Call transport leak probing will be disabled\n• ICMP spoofing checks will be disabled\n\nOnly local checks will remain available: direct signs, indirect signs, and port scanning</string>
     <string name="settings_cdn_pulling">CDN pulling</string>
     <string name="settings_cdn_pulling_desc">Sends HTTPS requests to Google/YouTube redirector and Cloudflare trace endpoints.</string>
     <string name="settings_cdn_pulling_warning_title">Enable CDN pulling?</string>
-    <string name="settings_cdn_pulling_warning_message">The app will send normal web requests to Google/YouTube, rutracker.org and meduza.io. These sites may see your device public IP and return short network details like country, datacenter, or proxy mode.</string>
+    <string name="settings_cdn_pulling_warning_message">The app will send normal web requests to Google/YouTube, www.cloudflare.com, one.one.one.one, rutracker.org and meduza.io. These sites may see your device public IP and return short network details like country, datacenter, or proxy mode.</string>
     <string name="settings_cdn_pulling_warning_confirm">Enable</string>
     <string name="settings_cdn_pulling_meduza">Include meduza.io</string>
     <string name="settings_cdn_pulling_meduza_desc">Send a request to meduza.io/cdn-cgi/trace as part of CDN pulling.</string>
@@ -521,7 +521,7 @@
     <string name="verdict_subtitle_running">Check in progress\u2026</string>
     <string name="verdict_subtitle_done">Completed \u00b7 %1$d categories</string>
     <string name="section_check_details">Check details</string>
-    <string name="privacy_footer_text">Check runs locally \u00b7 16 domains</string>
+    <string name="privacy_footer_text">Check runs locally \u00b7 network endpoints listed</string>
     <string name="privacy_footer_action">What\u2019s this?</string>
     <string name="tile_hint_placeholder">\u2014</string>
     <string name="tile_hint_loading">Checking\u2026</string>
@@ -594,7 +594,7 @@
     <string name="update_dialog_skip">Skip this version</string>
     <string name="update_dialog_later">Later</string>
     <string name="auto_update_onboarding_title">Enable update checks?</string>
-    <string name="auto_update_onboarding_message">On first launch the app can check GitHub Releases for a newer APK. If you disable this now, the app will not perform this check until you enable it manually in network settings.</string>
+    <string name="auto_update_onboarding_message">On first launch the app can contact api.github.com to check GitHub Releases for a newer APK. If you disable this now, the app will not perform this check until you enable it manually in network settings.</string>
     <string name="auto_update_onboarding_enable">Enable</string>
     <string name="auto_update_onboarding_disable">Do not enable</string>
 </resources>
