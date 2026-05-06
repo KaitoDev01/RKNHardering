@@ -203,6 +203,7 @@ class MainActivity : AppCompatActivity() {
         INDIRECT,
         NATIVE_SIGNS,
         ICMP,
+        RTT_TRIANGULATION,
         LOCATION,
         IP_CONSENSUS,
         BYPASS,
@@ -232,6 +233,10 @@ class MainActivity : AppCompatActivity() {
     private lateinit var iconIcmpSpoofing: ImageView
     private lateinit var statusIcmpSpoofing: TextView
     private lateinit var findingsIcmpSpoofing: LinearLayout
+    private lateinit var cardRttTriangulation: MaterialCardView
+    private lateinit var iconRttTriangulation: ImageView
+    private lateinit var statusRttTriangulation: TextView
+    private lateinit var findingsRttTriangulation: LinearLayout
     private lateinit var cardNativeSigns: MaterialCardView
     private lateinit var iconNativeSigns: ImageView
     private lateinit var statusNativeSigns: TextView
@@ -477,6 +482,10 @@ class MainActivity : AppCompatActivity() {
         iconIcmpSpoofing = findViewById(R.id.iconIcmpSpoofing)
         statusIcmpSpoofing = findViewById(R.id.statusIcmpSpoofing)
         findingsIcmpSpoofing = findViewById(R.id.findingsIcmpSpoofing)
+        cardRttTriangulation = findViewById(R.id.cardRttTriangulation)
+        iconRttTriangulation = findViewById(R.id.iconRttTriangulation)
+        statusRttTriangulation = findViewById(R.id.statusRttTriangulation)
+        findingsRttTriangulation = findViewById(R.id.findingsRttTriangulation)
         cardNativeSigns = findViewById(R.id.cardNativeSigns)
         iconNativeSigns = findViewById(R.id.iconNativeSigns)
         statusNativeSigns = findViewById(R.id.statusNativeSigns)
@@ -556,6 +565,7 @@ class MainActivity : AppCompatActivity() {
             Triple(CATEGORY_NAT, getString(R.string.main_card_native_signs), R.drawable.ic_lock),
             Triple(CATEGORY_STN, getString(R.string.main_card_call_transport), R.drawable.ic_call),
             Triple(CATEGORY_ICM, getString(R.string.main_card_icmp_spoofing), R.drawable.ic_network),
+            Triple(CATEGORY_RTT, getString(R.string.main_card_rtt_triangulation), R.drawable.ic_pin),
             Triple(CATEGORY_LOC, getString(R.string.main_card_location_signals), R.drawable.ic_location_on),
             Triple(CATEGORY_BYP, getString(R.string.settings_split_tunnel), R.drawable.ic_call_split),
         )
@@ -595,6 +605,7 @@ class MainActivity : AppCompatActivity() {
         CATEGORY_NAT -> R.id.cardNativeSigns
         CATEGORY_STN -> R.id.cardCallTransport
         CATEGORY_ICM -> R.id.cardIcmpSpoofing
+        CATEGORY_RTT -> R.id.cardRttTriangulation
         CATEGORY_LOC -> R.id.cardLocation
         CATEGORY_BYP -> R.id.cardBypass
         else -> error("Unknown category id: $id")
@@ -609,6 +620,7 @@ class MainActivity : AppCompatActivity() {
         CATEGORY_NAT -> R.id.headerNativeSigns
         CATEGORY_STN -> R.id.headerCallTransport
         CATEGORY_ICM -> R.id.headerIcmpSpoofing
+        CATEGORY_RTT -> R.id.headerRttTriangulation
         CATEGORY_LOC -> R.id.headerLocation
         CATEGORY_BYP -> R.id.headerBypass
         else -> error("Unknown category id: $id")
@@ -623,6 +635,7 @@ class MainActivity : AppCompatActivity() {
         CATEGORY_NAT -> R.id.headerDotNativeSigns
         CATEGORY_STN -> R.id.headerDotCallTransport
         CATEGORY_ICM -> R.id.headerDotIcmpSpoofing
+        CATEGORY_RTT -> R.id.headerDotRttTriangulation
         CATEGORY_LOC -> R.id.headerDotLocation
         CATEGORY_BYP -> R.id.headerDotBypass
         else -> error("Unknown category id: $id")
@@ -637,6 +650,7 @@ class MainActivity : AppCompatActivity() {
         CATEGORY_NAT -> R.id.headerIconNativeSigns
         CATEGORY_STN -> R.id.headerIconCallTransport
         CATEGORY_ICM -> R.id.headerIconIcmpSpoofing
+        CATEGORY_RTT -> R.id.headerIconRttTriangulation
         CATEGORY_LOC -> R.id.headerIconLocation
         CATEGORY_BYP -> R.id.headerIconBypass
         else -> error("Unknown category id: $id")
@@ -651,6 +665,7 @@ class MainActivity : AppCompatActivity() {
         CATEGORY_NAT -> R.id.headerTitleNativeSigns
         CATEGORY_STN -> R.id.headerTitleCallTransport
         CATEGORY_ICM -> R.id.headerTitleIcmpSpoofing
+        CATEGORY_RTT -> R.id.headerTitleRttTriangulation
         CATEGORY_LOC -> R.id.headerTitleLocation
         CATEGORY_BYP -> R.id.headerTitleBypass
         else -> error("Unknown category id: $id")
@@ -665,6 +680,7 @@ class MainActivity : AppCompatActivity() {
         CATEGORY_NAT -> R.id.headerHintNativeSigns
         CATEGORY_STN -> R.id.headerHintCallTransport
         CATEGORY_ICM -> R.id.headerHintIcmpSpoofing
+        CATEGORY_RTT -> R.id.headerHintRttTriangulation
         CATEGORY_LOC -> R.id.headerHintLocation
         CATEGORY_BYP -> R.id.headerHintBypass
         else -> error("Unknown category id: $id")
@@ -679,6 +695,7 @@ class MainActivity : AppCompatActivity() {
         CATEGORY_NAT -> R.id.chevronNativeSigns
         CATEGORY_STN -> R.id.chevronCallTransport
         CATEGORY_ICM -> R.id.chevronIcmpSpoofing
+        CATEGORY_RTT -> R.id.chevronRttTriangulation
         CATEGORY_LOC -> R.id.chevronLocation
         CATEGORY_BYP -> R.id.chevronBypass
         else -> error("Unknown category id: $id")
@@ -693,6 +710,7 @@ class MainActivity : AppCompatActivity() {
         CATEGORY_NAT -> R.id.bodyNativeSigns
         CATEGORY_STN -> R.id.bodyCallTransport
         CATEGORY_ICM -> R.id.bodyIcmpSpoofing
+        CATEGORY_RTT -> R.id.bodyRttTriangulation
         CATEGORY_LOC -> R.id.bodyLocation
         CATEGORY_BYP -> R.id.bodyBypass
         else -> error("Unknown category id: $id")
@@ -1050,6 +1068,7 @@ class MainActivity : AppCompatActivity() {
         val callTransportProbeEnabled = prefs.getBoolean(SettingsActivity.PREF_CALL_TRANSPORT_PROBE_ENABLED, false)
         val cdnPullingEnabled = prefs.getBoolean(SettingsActivity.PREF_CDN_PULLING_ENABLED, false)
         val cdnPullingMeduzaEnabled = prefs.getBoolean(SettingsActivity.PREF_CDN_PULLING_MEDUZA_ENABLED, true)
+        val rttTriangulationEnabled = prefs.getBoolean(SettingsActivity.PREF_RTT_TRIANGULATION_ENABLED, false)
         val tunProbeDebugEnabled = prefs.getBoolean(SettingsActivity.PREF_TUN_PROBE_DEBUG_ENABLED, false)
         val tunProbeModeOverride = com.notcvnt.rknhardering.probe.TunProbeModeOverride.fromPref(
             prefs.getString(
@@ -1078,6 +1097,7 @@ class MainActivity : AppCompatActivity() {
             callTransportProbeEnabled = callTransportProbeEnabled,
             cdnPullingEnabled = cdnPullingEnabled,
             cdnPullingMeduzaEnabled = cdnPullingMeduzaEnabled,
+            rttTriangulationEnabled = rttTriangulationEnabled,
             tunProbeDebugEnabled = tunProbeDebugEnabled,
             tunProbeModeOverride = tunProbeModeOverride,
             resolverConfig = resolverConfig,
@@ -1246,6 +1266,9 @@ class MainActivity : AppCompatActivity() {
         findingsIcmpSpoofing.removeAllViews()
         findingsIcmpSpoofing.visibility = View.GONE
 
+        findingsRttTriangulation.removeAllViews()
+        findingsRttTriangulation.visibility = View.GONE
+
         textNativeSignsSummary.text = ""
         textNativeSignsSummary.visibility = View.GONE
         findingsNativeSigns.removeAllViews()
@@ -1270,6 +1293,9 @@ class MainActivity : AppCompatActivity() {
             }
             if (settings.icmpSpoofingEnabled) {
                 stages += RunningStage.ICMP
+            }
+            if (settings.rttTriangulationEnabled) {
+                stages += RunningStage.RTT_TRIANGULATION
             }
         }
         stages += RunningStage.DIRECT
@@ -1328,6 +1354,20 @@ class MainActivity : AppCompatActivity() {
                 )
                 updateTileFromCategory(CATEGORY_ICM, update.result)
                 if (animate) animateContentReveal(findingsIcmpSpoofing)
+            }
+            is CheckUpdate.RttTriangulationReady -> {
+                markStageCompleted(RunningStage.RTT_TRIANGULATION)
+                ensureCardVisible(cardRttTriangulation, animate = false)
+                displayCategory(
+                    update.result,
+                    cardRttTriangulation,
+                    iconRttTriangulation,
+                    statusRttTriangulation,
+                    findingsRttTriangulation,
+                    activeCheckPrivacyMode,
+                )
+                updateTileFromCategory(CATEGORY_RTT, update.result)
+                if (animate) animateContentReveal(findingsRttTriangulation)
             }
             is CheckUpdate.DirectSignsReady -> {
                 markStageCompleted(RunningStage.DIRECT)
@@ -1414,6 +1454,7 @@ class MainActivity : AppCompatActivity() {
         RunningStage.INDIRECT -> CATEGORY_IND
         RunningStage.NATIVE_SIGNS -> CATEGORY_NAT
         RunningStage.ICMP -> CATEGORY_ICM
+        RunningStage.RTT_TRIANGULATION -> CATEGORY_RTT
         RunningStage.LOCATION -> CATEGORY_LOC
         RunningStage.IP_CONSENSUS -> CATEGORY_IPS
         RunningStage.BYPASS -> CATEGORY_BYP
@@ -1445,6 +1486,14 @@ class MainActivity : AppCompatActivity() {
                 icon = iconIcmpSpoofing,
                 status = statusIcmpSpoofing,
                 findingsContainer = findingsIcmpSpoofing,
+                hint = stageLoadingMessage(stage),
+            )
+            RunningStage.RTT_TRIANGULATION -> showCategoryLoading(
+                stage = stage,
+                card = cardRttTriangulation,
+                icon = iconRttTriangulation,
+                status = statusRttTriangulation,
+                findingsContainer = findingsRttTriangulation,
                 hint = stageLoadingMessage(stage),
             )
             RunningStage.DIRECT -> showCategoryLoading(
@@ -1567,6 +1616,13 @@ class MainActivity : AppCompatActivity() {
                     icon = iconIcmpSpoofing,
                     status = statusIcmpSpoofing,
                     findingsContainer = findingsIcmpSpoofing,
+                    message = stageStoppedMessage(stage),
+                )
+                RunningStage.RTT_TRIANGULATION -> showCategoryStopped(
+                    card = cardRttTriangulation,
+                    icon = iconRttTriangulation,
+                    status = statusRttTriangulation,
+                    findingsContainer = findingsRttTriangulation,
                     message = stageStoppedMessage(stage),
                 )
                 RunningStage.DIRECT -> showCategoryStopped(
@@ -1731,6 +1787,7 @@ class MainActivity : AppCompatActivity() {
             RunningStage.IP_COMPARISON -> getString(R.string.main_loading_ip_comparison)
             RunningStage.CDN_PULLING -> getString(R.string.main_loading_cdn_pulling)
             RunningStage.ICMP -> getString(R.string.main_loading_icmp)
+            RunningStage.RTT_TRIANGULATION -> getString(R.string.main_loading_rtt_triangulation)
             RunningStage.DIRECT -> getString(R.string.main_loading_direct)
             RunningStage.INDIRECT -> getString(R.string.main_loading_indirect)
             RunningStage.NATIVE_SIGNS -> getString(R.string.main_loading_native_signs)
@@ -1753,6 +1810,7 @@ class MainActivity : AppCompatActivity() {
             RunningStage.IP_COMPARISON -> cardIpComparison
             RunningStage.CDN_PULLING -> cardCdnPulling
             RunningStage.ICMP -> cardIcmpSpoofing
+            RunningStage.RTT_TRIANGULATION -> cardRttTriangulation
             RunningStage.DIRECT -> cardDirect
             RunningStage.INDIRECT -> cardIndirect
             RunningStage.NATIVE_SIGNS -> cardNativeSigns
@@ -1768,6 +1826,7 @@ class MainActivity : AppCompatActivity() {
             RunningStage.IP_COMPARISON -> statusIpComparison
             RunningStage.CDN_PULLING -> statusCdnPulling
             RunningStage.ICMP -> statusIcmpSpoofing
+            RunningStage.RTT_TRIANGULATION -> statusRttTriangulation
             RunningStage.DIRECT -> statusDirect
             RunningStage.INDIRECT -> statusIndirect
             RunningStage.NATIVE_SIGNS -> statusNativeSigns
@@ -3090,6 +3149,7 @@ class MainActivity : AppCompatActivity() {
         private const val CATEGORY_IND = "ind"
         private const val CATEGORY_STN = "stn"
         private const val CATEGORY_ICM = "icmp"
+        private const val CATEGORY_RTT = "rtt"
         private const val CATEGORY_LOC = "loc"
         private const val CATEGORY_BYP = "byp"
         private const val CATEGORY_NAT = "nat"
@@ -3350,6 +3410,10 @@ class MainActivity : AppCompatActivity() {
                 if (findingsIcmpSpoofing.childCount > 0) return
                 syncHintOnlyContainer(findingsIcmpSpoofing, previewMessageForCategory(id))
             }
+            CATEGORY_RTT -> {
+                if (findingsRttTriangulation.childCount > 0) return
+                syncHintOnlyContainer(findingsRttTriangulation, previewMessageForCategory(id))
+            }
             CATEGORY_LOC -> {
                 if (locationInfoSection.childCount > 0 || findingsLocation.childCount > 0) return
                 syncHintOnlyContainer(findingsLocation, previewMessageForCategory(id))
@@ -3372,6 +3436,7 @@ class MainActivity : AppCompatActivity() {
             CATEGORY_NAT -> getString(R.string.main_preview_native_signs)
             CATEGORY_STN -> getString(R.string.main_preview_call_transport)
             CATEGORY_ICM -> getString(R.string.main_preview_icmp)
+            CATEGORY_RTT -> getString(R.string.main_preview_rtt_triangulation)
             CATEGORY_LOC -> getString(R.string.main_preview_location)
             CATEGORY_BYP -> getString(R.string.main_preview_bypass)
             else -> getString(R.string.tile_hint_placeholder)

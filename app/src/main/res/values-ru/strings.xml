@@ -197,6 +197,7 @@
     <string name="main_preview_native_signs">Будет выполнена проверка нативных интерфейсов, маршрутов и низкоуровневых сигналов библиотек.</string>
     <string name="main_preview_call_transport">Будут проверены ответы STUN-серверов и сигналы утечки call transport.</string>
     <string name="main_preview_icmp">Будет выполнен резолв и пинг заблокированной и контрольной цели через активный маршрут.</string>
+    <string name="main_preview_rtt_triangulation">Будут пингнуты локальные и зарубежные сервисы для сравнения задержек.</string>
     <string name="main_preview_location">Будет выполнен сбор сигналов оператора, вышек и ближайших Wi-Fi точек.</string>
     <string name="main_preview_bypass">Будет выполнен поиск локального split tunnel bypass и доступных proxy endpoints.</string>
 
@@ -204,6 +205,7 @@
     <string name="main_loading_ip_comparison">Сравниваем внешний IP через несколько независимых сервисов.</string>
     <string name="main_loading_cdn_pulling">Проверяем, какие сетевые данные вернут заблокированные или CDN-backed endpoints.</string>
     <string name="main_loading_icmp">Резолвим и пингуем заблокированную и контрольную цели через активный маршрут.</string>
+    <string name="main_loading_rtt_triangulation">Пингуем локальные и зарубежные сервисы для сравнения задержек.</string>
     <string name="main_loading_direct">Ищем прямые признаки VPN, прокси и установленных клиентов.</string>
     <string name="main_loading_indirect">Проверяем интерфейсы, DNS, маршруты и локальные технические сигналы.</string>
     <string name="main_loading_native_signs">Проверяем нативные интерфейсы, маршруты и низкоуровневые сигналы библиотек.</string>
@@ -557,6 +559,26 @@
     <string name="checker_icmp_evidence_both">%1$s ответил, а RTT у %2$s оказался ниже ожидаемого порога</string>
     <string name="checker_icmp_evidence_blocked_replied">%1$s ответил по ICMP через активный маршрут</string>
     <string name="checker_icmp_evidence_control_too_fast">%1$s показал RTT ниже ожидаемого порога на активном маршруте</string>
+    <string name="main_card_rtt_triangulation">RTT-триангуляция β</string>
+    <string name="main_card_rtt_triangulation_description">Детекция VPN по задержкам до отечественных и зарубежных сервисов</string>
+    <string name="checker_rtt_summary_clean">Профиль задержек соответствует региону</string>
+    <string name="checker_rtt_summary_detected">Локальные сервисы медленнее зарубежных — возможен туннель</string>
+    <string name="checker_rtt_summary_needs_review">Задержки нестандартные, требуется ручная проверка</string>
+    <string name="checker_rtt_summary_inconclusive">Не удалось определить домашнюю страну</string>
+    <string name="checker_rtt_summary_unsupported_country">RTT-триангуляция в этой сборке поддерживает только РФ</string>
+    <string name="checker_rtt_summary_unavailable">Замеры RTT недоступны</string>
+    <string name="checker_rtt_target_home">Локальный</string>
+    <string name="checker_rtt_target_foreign">Зарубежный</string>
+    <string name="checker_rtt_evidence_template">%1$s — %2$.0f мс (jitter %3$.0f мс)</string>
+    <string name="checker_rtt_evidence_unreachable">%1$s — недоступен</string>
+    <string name="checker_rtt_finding_target">%1$s %2$s (%3$s): ответов %4$d/%5$d, avg %6$.0f мс, jitter %7$.0f мс</string>
+    <string name="checker_rtt_finding_target_unreachable">%1$s %2$s (%3$s): недоступен</string>
+    <string name="checker_rtt_finding_medians">Медиана задержек: локальные %1$s мс, зарубежные %2$s мс (порог %3$.0f мс)</string>
+    <string name="checker_rtt_finding_threshold_note">Локальная медиана выше порога означает, что трафик выходит за пределы страны прежде чем достичь локальных сервисов.</string>
+    <string name="checker_rtt_finding_jitter_note">Высокий jitter у большинства таргетов — уверенность понижена.</string>
+    <string name="checker_rtt_value_unavailable">н/д</string>
+    <string name="settings_rtt_triangulation_title">RTT-триангуляция</string>
+    <string name="settings_rtt_triangulation_description">Эксперимент: пингует локальные и зарубежные сервисы для детекции VPN по аномалиям задержки. Возможны ложные срабатывания в мобильных, спутниковых, CGNAT и перегруженных сетях.</string>
     <string name="checker_native_card_title">Нативные низкоуровневые проверки β</string>
     <string name="checker_native_unavailable">Нативная библиотека не загружена; проверки недоступны.</string>
     <string name="checker_native_unavailable_with_reason">Нативная библиотека не загружена: %1$s</string>

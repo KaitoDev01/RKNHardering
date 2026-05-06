@@ -25,6 +25,7 @@ enum class EvidenceSource {
     DIRECT_NETWORK_CAPABILITIES,
     INDIRECT_NETWORK_CAPABILITIES,
     ICMP_SPOOFING,
+    RTT_TRIANGULATION,
     SYSTEM_PROXY,
     INSTALLED_APP,
     VPN_SERVICE_DECLARATION,
@@ -343,6 +344,11 @@ data class CheckResult(
         findings = emptyList(),
     ),
     val icmpSpoofing: CategoryResult = CategoryResult(
+        name = "",
+        detected = false,
+        findings = emptyList(),
+    ),
+    val rttTriangulation: CategoryResult = CategoryResult(
         name = "",
         detected = false,
         findings = emptyList(),

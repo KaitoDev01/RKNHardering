@@ -197,6 +197,7 @@
     <string name="main_preview_native_signs">将检查原生接口、路由和底层库信号。</string>
     <string name="main_preview_call_transport">将检查 STUN 服务器响应和 call transport 泄漏信号。</string>
     <string name="main_preview_icmp">将通过当前活动路由解析并 ping 被封锁和对照主机。</string>
+    <string name="main_preview_rtt_triangulation">将 ping 本地和境外服务以比较往返延迟。</string>
     <string name="main_preview_location">将收集运营商、基站和附近 Wi-Fi 的迹象。</string>
     <string name="main_preview_bypass">将搜索本地 split tunnel bypass 和可用的 proxy endpoint。</string>
 
@@ -204,6 +205,7 @@
     <string name="main_loading_ip_comparison">正在通过多个独立服务比较公网 IP。</string>
     <string name="main_loading_cdn_pulling">正在检查被封锁或 CDN 支持的端点会返回哪些网络数据。</string>
     <string name="main_loading_icmp">正在通过当前活动路由解析并 ping 被封锁和对照主机。</string>
+    <string name="main_loading_rtt_triangulation">正在 ping 本地和境外服务以比较往返延迟。</string>
     <string name="main_loading_direct">正在查找 VPN、代理和已安装客户端的直接迹象。</string>
     <string name="main_loading_indirect">正在检查接口、DNS、路由和本地技术迹象。</string>
     <string name="main_loading_native_signs">正在检查原生接口、路由和底层库信号。</string>
@@ -270,6 +272,26 @@
     <string name="checker_icmp_evidence_both">%1$s 已响应，且 %2$s 的 RTT 一直低于预期阈值</string>
     <string name="checker_icmp_evidence_blocked_replied">%1$s 在当前活动路由上通过 ICMP 返回了响应</string>
     <string name="checker_icmp_evidence_control_too_fast">%1$s 的 RTT 在当前活动路由上一直低于预期阈值</string>
+    <string name="main_card_rtt_triangulation">RTT 三角定位 β</string>
+    <string name="main_card_rtt_triangulation_description">通过比较本地与境外服务的延迟检测 VPN</string>
+    <string name="checker_rtt_summary_clean">延迟特征与您所在地区一致</string>
+    <string name="checker_rtt_summary_detected">本地服务慢于境外 — 可能存在隧道</string>
+    <string name="checker_rtt_summary_needs_review">延迟异常但无法确定</string>
+    <string name="checker_rtt_summary_inconclusive">无法确定主国家</string>
+    <string name="checker_rtt_summary_unsupported_country">本版本仅支持俄罗斯</string>
+    <string name="checker_rtt_summary_unavailable">RTT 探测不可用</string>
+    <string name="checker_rtt_target_home">本地</string>
+    <string name="checker_rtt_target_foreign">境外</string>
+    <string name="checker_rtt_evidence_template">%1$s — %2$.0f 毫秒 (抖动 %3$.0f 毫秒)</string>
+    <string name="checker_rtt_evidence_unreachable">%1$s — 无法连接</string>
+    <string name="checker_rtt_finding_target">%1$s %2$s (%3$s): 回应 %4$d/%5$d, avg %6$.0f 毫秒, jitter %7$.0f 毫秒</string>
+    <string name="checker_rtt_finding_target_unreachable">%1$s %2$s (%3$s): 无法连接</string>
+    <string name="checker_rtt_finding_medians">延迟中位数: 本地 %1$s 毫秒, 境外 %2$s 毫秒 (阈值 %3$.0f 毫秒)</string>
+    <string name="checker_rtt_finding_threshold_note">本地中位数高于阈值表示流量在到达本地服务之前已离开本国。</string>
+    <string name="checker_rtt_finding_jitter_note">大多数目标的 jitter 较高 — 置信度已降低。</string>
+    <string name="checker_rtt_value_unavailable">无</string>
+    <string name="settings_rtt_triangulation_title">RTT 三角定位</string>
+    <string name="settings_rtt_triangulation_description">实验性：通过 ping 本地与境外服务，根据延迟异常检测 VPN。在移动、卫星、CGNAT 或拥塞网络中可能误报。</string>
 
     <string name="narrative_meaning_detected">红色结论表示自动检查已经收集到足够的绕过迹象。</string>
     <string name="narrative_meaning_needs_review">黄色结论表示存在一些迹象，但仍需人工复核。</string>

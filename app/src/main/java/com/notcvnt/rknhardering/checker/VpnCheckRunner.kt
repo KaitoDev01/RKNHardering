@@ -37,6 +37,7 @@ data class CheckSettings(
     val cdnPullingEnabled: Boolean = false,
     val cdnPullingMeduzaEnabled: Boolean = true,
     val icmpSpoofingEnabled: Boolean = true,
+    val rttTriangulationEnabled: Boolean = false,
     val tunProbeDebugEnabled: Boolean = false,
     val tunProbeModeOverride: TunProbeModeOverride = TunProbeModeOverride.AUTO,
     val resolverConfig: DnsResolverConfig = DnsResolverConfig.system(),
@@ -50,6 +51,7 @@ sealed interface CheckUpdate {
     data class IpComparisonReady(val result: IpComparisonResult) : CheckUpdate
     data class CdnPullingReady(val result: CdnPullingResult) : CheckUpdate
     data class IcmpSpoofingReady(val result: CategoryResult) : CheckUpdate
+    data class RttTriangulationReady(val result: CategoryResult) : CheckUpdate
     data class DirectSignsReady(val result: CategoryResult) : CheckUpdate
     data class IndirectSignsReady(val result: CategoryResult) : CheckUpdate
     data class LocationSignalsReady(val result: CategoryResult) : CheckUpdate
@@ -71,6 +73,8 @@ object VpnCheckRunner {
             { ctx, resolverConfig, meduzaEnabled -> CdnPullingChecker.check(ctx, resolverConfig = resolverConfig, meduzaEnabled = meduzaEnabled) },
         val icmpSpoofingCheck: suspend (Context, DnsResolverConfig) -> CategoryResult =
             { ctx, resolverConfig -> IcmpSpoofingChecker.check(ctx, resolverConfig) },
+        val rttTriangulationCheck: suspend (Context, DnsResolverConfig, GeoIpFacts?) -> CategoryResult =
+            { ctx, cfg, geo -> RttTriangulationChecker.check(ctx, cfg, geo) },
         val underlyingProbe: suspend (
             Context,
             DnsResolverConfig,
@@ -191,6 +195,18 @@ object VpnCheckRunner {
                 ),
             ),
         )
+        fun rtt(error: Throwable): CategoryResult = CategoryResult(
+            name = "RTT triangulation",
+            detected = false,
+            needsReview = true,
+            findings = listOf(
+                Finding(
+                    error.message ?: error::class.java.simpleName,
+                    isError = true,
+                    source = EvidenceSource.RTT_TRIANGULATION,
+                ),
+            ),
+        )
         fun direct(context: Context, error: Throwable): CategoryResult = CategoryResult(
             name = context.getString(R.string.checker_direct_category_name),
             detected = false,
@@ -254,6 +270,13 @@ object VpnCheckRunner {
         val icmpSpoofingDeferred = if (settings.networkRequestsEnabled && settings.icmpSpoofingEnabled) {
             safeAsync(context = Dispatchers.IO, fallback = { Fallbacks.icmp(context, it) }) {
                 dependencies.icmpSpoofingCheck(context, settings.resolverConfig)
+            }
+        } else null
+
+        val rttTriangulationDeferred = if (settings.networkRequestsEnabled && settings.rttTriangulationEnabled) {
+            safeAsync(context = Dispatchers.IO, fallback = { Fallbacks.rtt(it) }) {
+                val geoFacts = geoIpDeferred?.await()?.geoFacts
+                dependencies.rttTriangulationCheck(context, settings.resolverConfig, geoFacts)
             }
         } else null
 
@@ -341,6 +364,14 @@ object VpnCheckRunner {
                 }
             }
         }
+        val rttTriangulationReadyDeferred = rttTriangulationDeferred?.let { deferred ->
+            async {
+                deferred.await().also { result ->
+                    executionContext.throwIfCancelled()
+                    onUpdate?.invoke(CheckUpdate.RttTriangulationReady(result))
+                }
+            }
+        }
         val directReadyDeferred = async {
             directDeferred.await().also { result ->
                 executionContext.throwIfCancelled()
@@ -399,6 +430,11 @@ object VpnCheckRunner {
             detected = false,
             findings = emptyList(),
         )
+        val emptyRttTriangulation = CategoryResult(
+            name = context.getString(R.string.main_card_rtt_triangulation),
+            detected = false,
+            findings = emptyList(),
+        )
         val emptyBypass = BypassResult(
             proxyEndpoint = null,
             proxyOwner = null,
@@ -415,6 +451,7 @@ object VpnCheckRunner {
         val ipComparison = ipComparisonReadyDeferred?.await() ?: emptyIpComparison
         val cdnPulling = cdnPullingReadyDeferred?.await() ?: emptyCdnPulling
         val icmpSpoofing = icmpSpoofingReadyDeferred?.await() ?: emptyIcmpSpoofing
+        val rttTriangulation = rttTriangulationReadyDeferred?.await() ?: emptyRttTriangulation
         val directSigns = directReadyDeferred.await()
         val indirectSigns = indirectReadyDeferred.await()
         val locationSignals = locationReadyDeferred.await()
@@ -463,6 +500,7 @@ object VpnCheckRunner {
             tunProbeDiagnostics = tunProbeResult?.tunProbeDiagnostics,
             nativeSigns = nativeSigns,
             icmpSpoofing = icmpSpoofing,
+            rttTriangulation = rttTriangulation,
             ipConsensus = ipConsensus,
         )
     }

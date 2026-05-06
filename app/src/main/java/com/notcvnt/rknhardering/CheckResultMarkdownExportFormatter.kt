@@ -45,6 +45,7 @@ internal object CheckResultMarkdownExportFormatter {
         appendCategorySection(builder, context.getString(R.string.main_card_direct_signs), result.directSigns, snapshot.privacyMode)
         appendCategorySection(builder, context.getString(R.string.main_card_indirect_signs), result.indirectSigns, snapshot.privacyMode)
         appendCategorySection(builder, context.getString(R.string.main_card_icmp_spoofing), result.icmpSpoofing, snapshot.privacyMode)
+        appendCategorySection(builder, context.getString(R.string.main_card_rtt_triangulation), result.rttTriangulation, snapshot.privacyMode)
         appendCategorySection(builder, context.getString(R.string.main_card_location_signals), result.locationSignals, snapshot.privacyMode)
         appendIpChannelsSection(builder, result.ipConsensus, snapshot.privacyMode)
         appendBypassSection(builder, context, result.bypassResult, snapshot.privacyMode)
@@ -141,6 +142,12 @@ internal object CheckResultMarkdownExportFormatter {
             title = context.getString(R.string.main_card_icmp_spoofing),
             status = sectionStatusTag(result.icmpSpoofing.detected, result.icmpSpoofing.needsReview, result.icmpSpoofing.hasError),
             summary = buildCategorySummary(result.icmpSpoofing, snapshot.privacyMode),
+        )
+        appendSectionSummaryRow(
+            builder,
+            title = context.getString(R.string.main_card_rtt_triangulation),
+            status = sectionStatusTag(result.rttTriangulation.detected, result.rttTriangulation.needsReview, result.rttTriangulation.hasError),
+            summary = buildCategorySummary(result.rttTriangulation, snapshot.privacyMode),
         )
         appendSectionSummaryRow(
             builder,

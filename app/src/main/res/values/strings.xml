@@ -196,6 +196,7 @@
     <string name="main_preview_native_signs">Native interfaces, routes, and low-level library signals will be checked.</string>
     <string name="main_preview_call_transport">STUN server responses and call transport leak signals will be checked.</string>
     <string name="main_preview_icmp">Blocked and control hosts will be resolved and pinged through the active route.</string>
+    <string name="main_preview_rtt_triangulation">Local and foreign services will be pinged to compare round-trip latency.</string>
     <string name="main_preview_location">Carrier, cell tower, and nearby Wi-Fi signals will be collected.</string>
     <string name="main_preview_bypass">A search for local split tunnel bypasses and available proxy endpoints will be performed.</string>
 
@@ -203,6 +204,7 @@
     <string name="main_loading_ip_comparison">Comparing the public IP through multiple independent services.</string>
     <string name="main_loading_cdn_pulling">Checking what blocked or CDN-backed endpoints return about your network.</string>
     <string name="main_loading_icmp">Resolving and pinging blocked and control hosts through the active route.</string>
+    <string name="main_loading_rtt_triangulation">Pinging local and foreign services to compare round-trip latency.</string>
     <string name="main_loading_direct">Looking for direct signs of VPNs, proxies, and installed clients.</string>
     <string name="main_loading_indirect">Checking interfaces, DNS, routes, and local technical signals.</string>
     <string name="main_loading_native_signs">Checking native interfaces, routes, and low-level library signals.</string>
@@ -552,6 +554,26 @@
     <string name="checker_icmp_evidence_both">%1$s replied and %2$s RTT stayed below the expected threshold</string>
     <string name="checker_icmp_evidence_blocked_replied">%1$s replied over ICMP on the active route</string>
     <string name="checker_icmp_evidence_control_too_fast">%1$s RTT stayed below the expected threshold on the active route</string>
+    <string name="main_card_rtt_triangulation">RTT triangulation β</string>
+    <string name="main_card_rtt_triangulation_description">Detects VPN by comparing latency to local vs foreign services</string>
+    <string name="checker_rtt_summary_clean">Latency profile matches your region</string>
+    <string name="checker_rtt_summary_detected">Local services slower than foreign — possible tunnel</string>
+    <string name="checker_rtt_summary_needs_review">Latency unusual but inconclusive</string>
+    <string name="checker_rtt_summary_inconclusive">Home country undetermined</string>
+    <string name="checker_rtt_summary_unsupported_country">RTT triangulation supports RU only in this build</string>
+    <string name="checker_rtt_summary_unavailable">RTT probes unavailable</string>
+    <string name="checker_rtt_target_home">Local</string>
+    <string name="checker_rtt_target_foreign">Foreign</string>
+    <string name="checker_rtt_evidence_template">%1$s — %2$.0f ms (jitter %3$.0f ms)</string>
+    <string name="checker_rtt_evidence_unreachable">%1$s — unreachable</string>
+    <string name="checker_rtt_finding_target">%1$s %2$s (%3$s): %4$d/%5$d replies, avg %6$.0f ms, jitter %7$.0f ms</string>
+    <string name="checker_rtt_finding_target_unreachable">%1$s %2$s (%3$s): unreachable</string>
+    <string name="checker_rtt_finding_medians">Median latency: local %1$s ms, foreign %2$s ms (threshold %3$.0f ms)</string>
+    <string name="checker_rtt_finding_threshold_note">A local median above the threshold suggests traffic is leaving the country before reaching local services.</string>
+    <string name="checker_rtt_finding_jitter_note">High jitter on the majority of targets — confidence reduced.</string>
+    <string name="checker_rtt_value_unavailable">n/a</string>
+    <string name="settings_rtt_triangulation_title">RTT triangulation</string>
+    <string name="settings_rtt_triangulation_description">Experimental: pings local and foreign servers to detect VPN by latency anomalies. May produce false positives on cellular, satellite, CGNAT, or congested networks.</string>
     <string name="checker_native_card_title">Native low-level checks β</string>
     <string name="checker_native_unavailable">Native library not loaded; native checks are unavailable.</string>
     <string name="checker_native_unavailable_with_reason">Native library not loaded: %1$s</string>

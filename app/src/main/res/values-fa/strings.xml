@@ -197,6 +197,7 @@
     <string name="main_preview_native_signs">بررسی اینترفیس‌های بومی، مسیرها و نشانه‌های سطح‌پایین کتابخانه‌ها انجام خواهد شد.</string>
     <string name="main_preview_call_transport">پاسخ‌های STUN serverها و نشانه‌های نشت call transport بررسی خواهند شد.</string>
     <string name="main_preview_icmp">resolve و ping میزبان‌های مسدود و کنترلی از طریق مسیر فعال انجام خواهد شد.</string>
+    <string name="main_preview_rtt_triangulation">سرویس‌های محلی و خارجی پینگ خواهند شد تا تاخیر مقایسه شود.</string>
     <string name="main_preview_location">جمع‌آوری نشانه‌های اپراتور، دکل و Wi-Fiهای نزدیک انجام خواهد شد.</string>
     <string name="main_preview_bypass">جست‌وجوی split tunnel bypass محلی و proxy endpointهای در دسترس انجام خواهد شد.</string>
 
@@ -204,6 +205,7 @@
     <string name="main_loading_ip_comparison">در حال مقایسه IP عمومی از طریق چند سرویس مستقل.</string>
     <string name="main_loading_cdn_pulling">در حال بررسی اینکه endpointهای مسدود یا CDN-backed چه داده‌ای درباره شبکه شما برمی‌گردانند.</string>
     <string name="main_loading_icmp">در حال resolve و ping کردن میزبان‌های مسدود و کنترلی از طریق مسیر فعال.</string>
+    <string name="main_loading_rtt_triangulation">در حال پینگ سرویس‌های محلی و خارجی برای مقایسه تاخیر.</string>
     <string name="main_loading_direct">در حال جست‌وجوی نشانه‌های مستقیم VPN، proxy و کلاینت‌های نصب‌شده.</string>
     <string name="main_loading_indirect">در حال بررسی اینترفیس‌ها، DNS، مسیرها و نشانه‌های فنی محلی.</string>
     <string name="main_loading_native_signs">در حال بررسی اینترفیس‌های بومی، مسیرها و نشانه‌های سطح‌پایین کتابخانه‌ها.</string>
@@ -271,6 +273,26 @@
     <string name="checker_icmp_evidence_both">%1$s پاسخ داد و RTT برای %2$s پایین‌تر از آستانه مورد انتظار ماند</string>
     <string name="checker_icmp_evidence_blocked_replied">%1$s روی مسیر فعال از طریق ICMP پاسخ داد</string>
     <string name="checker_icmp_evidence_control_too_fast">RTT برای %1$s روی مسیر فعال پایین‌تر از آستانه مورد انتظار ماند</string>
+    <string name="main_card_rtt_triangulation">مثلث‌بندی RTT β</string>
+    <string name="main_card_rtt_triangulation_description">شناسایی VPN با مقایسهٔ تاخیر به سرویس‌های محلی و خارجی</string>
+    <string name="checker_rtt_summary_clean">الگوی تاخیر با منطقهٔ شما مطابقت دارد</string>
+    <string name="checker_rtt_summary_detected">سرویس‌های محلی کندتر از خارجی هستند — احتمال تونل</string>
+    <string name="checker_rtt_summary_needs_review">تاخیر غیرمعمول است اما قطعی نیست</string>
+    <string name="checker_rtt_summary_inconclusive">کشور خانگی شناسایی نشد</string>
+    <string name="checker_rtt_summary_unsupported_country">در این نسخه فقط روسیه پشتیبانی می‌شود</string>
+    <string name="checker_rtt_summary_unavailable">اندازه‌گیری RTT در دسترس نیست</string>
+    <string name="checker_rtt_target_home">محلی</string>
+    <string name="checker_rtt_target_foreign">خارجی</string>
+    <string name="checker_rtt_evidence_template">%1$s — %2$.0f ms (لرزش %3$.0f ms)</string>
+    <string name="checker_rtt_evidence_unreachable">%1$s — در دسترس نیست</string>
+    <string name="checker_rtt_finding_target">%1$s %2$s (%3$s): پاسخ‌ها %4$d/%5$d، avg %6$.0f ms، jitter %7$.0f ms</string>
+    <string name="checker_rtt_finding_target_unreachable">%1$s %2$s (%3$s): در دسترس نیست</string>
+    <string name="checker_rtt_finding_medians">میانه تاخیر: محلی %1$s ms، خارجی %2$s ms (حد %3$.0f ms)</string>
+    <string name="checker_rtt_finding_threshold_note">میانه محلی بالاتر از حد، یعنی ترافیک پیش از رسیدن به سرویس‌های محلی، از کشور خارج می‌شود.</string>
+    <string name="checker_rtt_finding_jitter_note">jitter بالا در اکثر مقاصد — اطمینان کاهش یافت.</string>
+    <string name="checker_rtt_value_unavailable">ندارد</string>
+    <string name="settings_rtt_triangulation_title">مثلث‌بندی RTT</string>
+    <string name="settings_rtt_triangulation_description">آزمایشی: با پینگ سرویس‌های محلی و خارجی، VPN را از طریق ناهنجاری‌های تاخیر شناسایی می‌کند. ممکن است در شبکه‌های موبایل، ماهواره‌ای، CGNAT و شلوغ نتایج اشتباه بدهد.</string>
 
     <string name="narrative_meaning_detected">نتیجه قرمز یعنی بررسی خودکار نشانه‌های کافی از دور زدن را جمع کرده است.</string>
     <string name="narrative_meaning_needs_review">نتیجه زرد یعنی نشانه‌هایی وجود دارد، اما نیاز به بررسی دستی دارد.</string>

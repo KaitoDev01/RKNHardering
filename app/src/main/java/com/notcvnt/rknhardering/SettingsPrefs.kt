@@ -13,6 +13,7 @@ internal object SettingsPrefs {
     const val PREF_CDN_PULLING_ENABLED = "pref_cdn_pulling_enabled"
     const val PREF_CDN_PULLING_MEDUZA_ENABLED = "pref_cdn_pulling_meduza_enabled"
     const val PREF_CALL_TRANSPORT_PROBE_ENABLED = "pref_call_transport_probe_enabled"
+    const val PREF_RTT_TRIANGULATION_ENABLED = "pref_rtt_triangulation_enabled"
     const val PREF_TUN_PROBE_DEBUG_ENABLED = "pref_tun_probe_debug_enabled"
     const val PREF_TUN_PROBE_MODE_OVERRIDE = "pref_tun_probe_mode_override"
     const val PREF_DNS_RESOLVER_MODE = "pref_dns_resolver_mode"
