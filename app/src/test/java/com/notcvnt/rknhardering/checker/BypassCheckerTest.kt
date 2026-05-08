@@ -596,13 +596,18 @@ class BypassCheckerTest {
         assertEquals(LocalProxyCheckStatus.AUTH_REQUIRED, evaluation.proxyChecks.single().status)
         assertTrue(BypassChecker.proxyChecksNeedReview(evaluation.proxyChecks))
         assertFalse(evidence.any { it.source == EvidenceSource.SPLIT_TUNNEL_BYPASS && it.detected })
+        // AUTH_REQUIRED + UNRESOLVED owner is downgraded to informational so
+        // the verdict isn't inflated by an unattributable listener that we
+        // cannot probe further.
         assertTrue(
             findings.any {
                 it.source == EvidenceSource.LOCAL_PROXY &&
-                    it.needsReview &&
+                    it.isInformational &&
+                    !it.needsReview &&
                     !it.detected
             },
         )
+        assertFalse(evidence.any { it.source == EvidenceSource.LOCAL_PROXY })
     }
 
     @Test

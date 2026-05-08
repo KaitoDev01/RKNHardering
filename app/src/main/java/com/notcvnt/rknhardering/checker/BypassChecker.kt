@@ -473,31 +473,40 @@ object BypassChecker {
 
         val proxyDetected = proxyCheck.status == LocalProxyCheckStatus.CONFIRMED_BYPASS
 
+        // Treat AUTH_REQUIRED endpoints with no resolved owner as informational
+        // noise: bypass cannot be confirmed (no probe possible) and we can't
+        // attribute the listening socket to a known app. Emitting them as
+        // evidence inflates the verdict and confuses the user.
+        val authRequiredUnresolved = proxyCheck.status == LocalProxyCheckStatus.AUTH_REQUIRED &&
+            proxyCheck.ownerStatus == LocalProxyOwnerStatus.UNRESOLVED
         findings.add(
             Finding(
                 description = description,
                 detected = proxyDetected,
-                needsReview = !proxyDetected,
+                needsReview = !proxyDetected && !authRequiredUnresolved,
+                isInformational = authRequiredUnresolved,
                 source = EvidenceSource.LOCAL_PROXY,
                 confidence = EvidenceConfidence.MEDIUM,
                 family = familySuffix,
                 packageName = LocalProxyOwnerFormatter.packageName(proxyCheck.owner),
             ),
         )
-        evidence.add(
-            EvidenceItem(
-                source = EvidenceSource.LOCAL_PROXY,
-                detected = true,
-                confidence = EvidenceConfidence.MEDIUM,
-                description = buildString {
-                    append("Detected open ${proxyEndpoint.type.name} proxy at ${formatHostPort(proxyEndpoint.host, proxyEndpoint.port)}")
-                    append(formatOwnerSuffix(context, proxyCheck.owner, proxyCheck.ownerStatus))
-                    append(ownerMetadataSuffix)
-                },
-                family = familySuffix,
-                packageName = LocalProxyOwnerFormatter.packageName(proxyCheck.owner),
-            ),
-        )
+        if (!authRequiredUnresolved) {
+            evidence.add(
+                EvidenceItem(
+                    source = EvidenceSource.LOCAL_PROXY,
+                    detected = true,
+                    confidence = EvidenceConfidence.MEDIUM,
+                    description = buildString {
+                        append("Detected open ${proxyEndpoint.type.name} proxy at ${formatHostPort(proxyEndpoint.host, proxyEndpoint.port)}")
+                        append(formatOwnerSuffix(context, proxyCheck.owner, proxyCheck.ownerStatus))
+                        append(ownerMetadataSuffix)
+                    },
+                    family = familySuffix,
+                    packageName = LocalProxyOwnerFormatter.packageName(proxyCheck.owner),
+                ),
+            )
+        }
 
         if (proxyCheck.status != LocalProxyCheckStatus.AUTH_REQUIRED) {
             findings.add(Finding(context.getString(R.string.checker_bypass_proxy_ip, proxyCheck.proxyIp ?: unavailable)))

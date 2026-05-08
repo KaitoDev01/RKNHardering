@@ -350,6 +350,12 @@
     <string name="narrative_reason_fallback_review">信号不完整或相互矛盾，因此需要人工复核。</string>
     <string name="narrative_reason_fallback_clean">未发现决定性的绕过迹象。</string>
 
+    <string name="narrative_home_routed_roaming_confirmed">外国 SIM（%1$s，%2$s）通过俄罗斯访问网络接入。公网 IP 属于归属运营商的 ASN，这是正常的归属路由漫游，并非绕过。</string>
+    <string name="narrative_home_routed_roaming_confirmed_country">外国 SIM（%1$s）通过俄罗斯访问网络接入。公网 IP 属于归属运营商的 ASN，这是正常的归属路由漫游，并非绕过。</string>
+    <string name="narrative_home_routed_roaming_likely">外国 SIM（%1$s，%2$s）通过俄罗斯访问网络接入。数据会话很可能在归属国出口，这种合法情景看起来像绕过。</string>
+    <string name="narrative_home_routed_roaming_likely_country">外国 SIM（%1$s）通过俄罗斯访问网络接入。数据会话很可能在归属国出口，这种合法情景看起来像绕过。</string>
+    <string name="narrative_home_routed_roaming_generic">外国 SIM 通过俄罗斯访问网络接入。数据会话可能合法地在境外出口（归属路由漫游）。</string>
+
     <string name="checker_yes">是</string>
     <string name="checker_no">否</string>
     <string name="checker_proxy_owner_suffix">（所有者：%1$s）</string>

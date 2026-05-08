@@ -124,12 +124,39 @@ class CdnPullingCheckerTest {
         )
 
         assertTrue(result.detected)
-        assertTrue(result.needsReview)
+        // No IP conflict — partial trace data alone is informational.
+        assertFalse(result.needsReview)
         assertEquals(
             context.getString(R.string.checker_cdn_pulling_summary_detected_no_ip, 2, 2),
             result.summary,
         )
         assertTrue(result.findings.any { it.description == "meduza.io: IP: 203.0.113.64, LOC: FI" })
+    }
+
+    @Test
+    fun `evaluate raises review when actionable IPs disagree`() {
+        val result = CdnPullingChecker.evaluate(
+            context = context,
+            responses = listOf(
+                CdnPullingResponse(
+                    targetLabel = "meduza.io",
+                    url = "https://meduza.io/cdn-cgi/trace",
+                    ip = "203.0.113.64",
+                    ipv4 = "203.0.113.64",
+                    importantFields = linkedMapOf("IP" to "203.0.113.64"),
+                ),
+                CdnPullingResponse(
+                    targetLabel = "redirector.googlevideo.com",
+                    url = "https://redirector.googlevideo.com/report_mapping?di=no",
+                    ip = "198.51.100.42",
+                    ipv4 = "198.51.100.42",
+                    importantFields = linkedMapOf("IP" to "198.51.100.42"),
+                ),
+            ),
+        )
+
+        assertTrue(result.detected)
+        assertTrue(result.needsReview)
     }
 
     @Test

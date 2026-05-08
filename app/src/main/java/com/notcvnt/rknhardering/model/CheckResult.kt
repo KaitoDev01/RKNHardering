@@ -8,10 +8,36 @@ data class GeoIpFacts(
     val ip: String? = null,
     val countryCode: String? = null,
     val asn: String? = null,
+    val asnCode: String? = null,
+    val isp: String? = null,
+    val org: String? = null,
     val outsideRu: Boolean = false,
     val hosting: Boolean = false,
     val proxyDb: Boolean = false,
     val fetchError: Boolean = false,
+    val expectedRoamingExit: Boolean = false,
+    val expectedRoamingExitReason: String? = null,
+)
+
+/**
+ * Structured signals from LocationSignalsChecker, used by VerdictEngine and the
+ * UI to recognise "home-routed roaming" — a foreign SIM connected via the
+ * Russian visited network whose data plane still exits via the home country.
+ */
+data class LocationSignalsFacts(
+    val networkMcc: String? = null,
+    val networkMnc: String? = null,
+    val networkCountryIso: String? = null,
+    val networkOperatorName: String? = null,
+    val networkIsRussia: Boolean = false,
+    val homeSimMcc: String? = null,
+    val homeSimMnc: String? = null,
+    val homeSimCountryIso: String? = null,
+    val homeSimCountryIsRussia: Boolean = false,
+    val homeSimOperatorName: String? = null,
+    val anySimReportedRoaming: Boolean = false,
+    val homeRoutedRoaming: Boolean = false,
+    val homeRoutedRoamingReason: String? = null,
 )
 
 enum class EvidenceConfidence {
@@ -39,6 +65,7 @@ enum class EvidenceSource {
     PROXY_TECHNICAL_SIGNAL,
     DUMPSYS,
     LOCATION_SIGNALS,
+    HOME_ROUTED_ROAMING,
     VPN_GATEWAY_LEAK,
     VPN_NETWORK_BINDING,
     TUN_ACTIVE_PROBE,
@@ -233,6 +260,7 @@ data class CategoryResult(
     val callTransportLeaks: List<CallTransportLeakResult> = emptyList(),
     val stunProbeGroups: List<StunProbeGroupResult> = emptyList(),
     val geoFacts: GeoIpFacts? = null,
+    val locationFacts: LocationSignalsFacts? = null,
 ) {
     val hasError: Boolean
         get() = findings.any { it.isError }

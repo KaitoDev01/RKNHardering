@@ -324,6 +324,12 @@
     <string name="narrative_reason_fallback_review">Signals are partial or contradictory, so manual review is needed.</string>
     <string name="narrative_reason_fallback_clean">No decisive bypass signals were found.</string>
 
+    <string name="narrative_home_routed_roaming_confirmed">A foreign SIM (%1$s, %2$s) is connected via a Russian visited network. The public IP belongs to the home operator\'s ASN, which is normal home-routed roaming and not a bypass.</string>
+    <string name="narrative_home_routed_roaming_confirmed_country">A foreign SIM (%1$s) is connected via a Russian visited network. The public IP belongs to the home operator\'s ASN, which is normal home-routed roaming and not a bypass.</string>
+    <string name="narrative_home_routed_roaming_likely">A foreign SIM (%1$s, %2$s) is connected via a Russian visited network. The data session likely exits via the home country, which can look like a bypass.</string>
+    <string name="narrative_home_routed_roaming_likely_country">A foreign SIM (%1$s) is connected via a Russian visited network. The data session likely exits via the home country, which can look like a bypass.</string>
+    <string name="narrative_home_routed_roaming_generic">A foreign SIM is connected via a Russian visited network. The data session may legitimately exit abroad (home-routed roaming).</string>
+
     <!-- Checker strings -->
     <string name="checker_yes">yes</string>
     <string name="checker_no">no</string>

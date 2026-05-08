@@ -14,6 +14,7 @@ import com.notcvnt.rknhardering.model.EvidenceSource
 import com.notcvnt.rknhardering.model.Finding
 import com.notcvnt.rknhardering.model.GeoIpFacts
 import com.notcvnt.rknhardering.model.IpConsensusResult
+import com.notcvnt.rknhardering.model.LocationSignalsFacts
 import com.notcvnt.rknhardering.model.Verdict
 import org.junit.Assert.assertEquals
 import org.junit.Test
@@ -165,6 +166,69 @@ class VerdictEngineTest {
             ipConsensus = IpConsensusResult.empty(),
         )
         assertEquals(Verdict.DETECTED, verdict)
+    }
+
+    @Test
+    fun `home-routed roaming with foreign sim suppresses R4 detect`() {
+        val geo = category(
+            geoFacts = GeoIpFacts(
+                outsideRu = true,
+                countryCode = "FR",
+                expectedRoamingExit = true,
+            ),
+        )
+        val location = CategoryResult(
+            name = "loc",
+            detected = false,
+            findings = listOf(Finding("network_mcc_ru:true")),
+            locationFacts = LocationSignalsFacts(
+                networkMcc = "250",
+                networkIsRussia = true,
+                homeSimMcc = "208",
+                homeSimCountryIso = "FR",
+                homeRoutedRoaming = true,
+            ),
+        )
+        val verdict = VerdictEngine.evaluate(
+            geoIp = geo,
+            directSigns = category(),
+            indirectSigns = category(),
+            locationSignals = location,
+            bypassResult = bypass(),
+            ipConsensus = IpConsensusResult.empty(),
+        )
+        // Should fall through to NOT_DETECTED — this is the issue #63 case.
+        assertEquals(Verdict.NOT_DETECTED, verdict)
+    }
+
+    @Test
+    fun `home-routed roaming without ASN match still suppresses verdict`() {
+        // Even without GeoIP ASN confirmation, the home-routed-roaming flag
+        // alone is enough to gate R4 — the fallback for unknown carriers.
+        val geo = category(
+            geoFacts = GeoIpFacts(outsideRu = true, countryCode = "FR"),
+        )
+        val location = CategoryResult(
+            name = "loc",
+            detected = false,
+            findings = listOf(Finding("network_mcc_ru:true")),
+            locationFacts = LocationSignalsFacts(
+                networkMcc = "250",
+                networkIsRussia = true,
+                homeSimMcc = "208",
+                homeSimCountryIso = "FR",
+                homeRoutedRoaming = true,
+            ),
+        )
+        val verdict = VerdictEngine.evaluate(
+            geoIp = geo,
+            directSigns = category(),
+            indirectSigns = category(),
+            locationSignals = location,
+            bypassResult = bypass(),
+            ipConsensus = IpConsensusResult.empty(),
+        )
+        assertEquals(Verdict.NOT_DETECTED, verdict)
     }
 
     @Test
@@ -519,14 +583,17 @@ class VerdictEngineTest {
         needsReview: Boolean = false,
         callTransportLeaks: List<CallTransportLeakResult> = emptyList(),
         geoFacts: GeoIpFacts? = null,
+        findings: List<Finding> = emptyList(),
+        locationFacts: LocationSignalsFacts? = null,
     ): CategoryResult = CategoryResult(
         name = "test",
         detected = evidence.any { it.detected },
-        findings = emptyList(),
+        findings = findings,
         needsReview = needsReview,
         evidence = evidence,
         callTransportLeaks = callTransportLeaks,
         geoFacts = geoFacts,
+        locationFacts = locationFacts,
     )
 
     private fun bypass(

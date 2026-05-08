@@ -4,6 +4,7 @@ import com.notcvnt.rknhardering.model.EvidenceConfidence
 import com.notcvnt.rknhardering.model.EvidenceSource
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
+import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertTrue
 import org.junit.Test
 
@@ -375,8 +376,11 @@ class LocationSignalsCheckerTest {
                 networkCountryIso = "gr",
                 networkOperatorName = "Cosmote",
                 simCards = listOf(
-                    sim(slotIndex = 0, subscriptionId = 1, simMcc = "250", simCountryIso = "ru", operatorName = "MegaFon", isRoaming = false),
-                    sim(slotIndex = 1, subscriptionId = 2, simMcc = "202", simCountryIso = "gr", operatorName = "Cosmote", isRoaming = false),
+                    // Home SIM is foreign (GR) and matches the visited (GR) network — no
+                    // Russian SIM means we cannot blame the geo signal on home-routed
+                    // roaming, so confidence stays at MEDIUM.
+                    sim(slotIndex = 0, subscriptionId = 1, simMcc = "202", simCountryIso = "gr", operatorName = "Cosmote", isRoaming = false),
+                    sim(slotIndex = 1, subscriptionId = 2, simMcc = "208", simCountryIso = "fr", operatorName = "Orange", isRoaming = false),
                 ),
             ),
         )
@@ -411,6 +415,39 @@ class LocationSignalsCheckerTest {
                 it.source == EvidenceSource.LOCATION_SIGNALS && it.confidence == EvidenceConfidence.LOW
             },
         )
+    }
+
+    @Test
+    fun `foreign sim on russian visited network is flagged as home-routed roaming`() {
+        val result = LocationSignalsChecker.evaluate(
+            snapshot(
+                networkMcc = "250",
+                networkCountryIso = "ru",
+                networkOperatorName = "MegaFon",
+                simCards = listOf(
+                    sim(
+                        slotIndex = 0,
+                        subscriptionId = 1,
+                        simMcc = "208",
+                        simCountryIso = "fr",
+                        operatorName = "Free Mobile",
+                        isRoaming = false,
+                    ),
+                ),
+            ),
+        )
+
+        assertFalse(result.needsReview)
+        assertFalse(result.detected)
+        assertNotNull(result.locationFacts)
+        assertTrue(result.locationFacts!!.homeRoutedRoaming)
+        assertEquals("208", result.locationFacts!!.homeSimMcc)
+        assertEquals("FR", result.locationFacts!!.homeSimCountryIso)
+        assertTrue(result.findings.any { it.description.startsWith("home_routed_roaming:true") })
+        assertTrue(result.evidence.any { it.source == EvidenceSource.HOME_ROUTED_ROAMING })
+        // SIM-MCC mismatch flips the displayed roaming state to "yes" even when
+        // telephony reported it as "no" (the bug from issue #63).
+        assertTrue(result.findings.any { it.description == "SIM[0] Roaming: yes" })
     }
 
     @Test

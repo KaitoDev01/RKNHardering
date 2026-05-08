@@ -40,6 +40,7 @@ data class VerdictNarrative(
     val meaningRows: List<String>,
     val discoveredRows: List<NarrativeRow>,
     val reasonRows: List<String>,
+    val homeRoutedRoamingNote: String? = null,
 )
 
 object VerdictNarrativeBuilder {
@@ -57,7 +58,28 @@ object VerdictNarrativeBuilder {
             meaningRows = buildMeaningRows(context, result.verdict, exposureStatus),
             discoveredRows = buildDiscoveredRows(context, snapshot, exposureStatus, privacyMode),
             reasonRows = buildReasonRows(context, result),
+            homeRoutedRoamingNote = buildHomeRoutedRoamingNote(context, result),
         )
+    }
+
+    private fun buildHomeRoutedRoamingNote(context: Context, result: CheckResult): String? {
+        val facts = result.locationSignals.locationFacts ?: return null
+        if (!facts.homeRoutedRoaming) return null
+        val operator = facts.homeSimOperatorName?.takeIf { it.isNotBlank() }
+        val country = facts.homeSimCountryIso?.takeIf { it.isNotBlank() }
+        val asnConfirmed = result.geoIp.geoFacts?.expectedRoamingExit == true
+        return when {
+            asnConfirmed && operator != null && country != null ->
+                context.getString(R.string.narrative_home_routed_roaming_confirmed, operator, country)
+            asnConfirmed && country != null ->
+                context.getString(R.string.narrative_home_routed_roaming_confirmed_country, country)
+            operator != null && country != null ->
+                context.getString(R.string.narrative_home_routed_roaming_likely, operator, country)
+            country != null ->
+                context.getString(R.string.narrative_home_routed_roaming_likely_country, country)
+            else ->
+                context.getString(R.string.narrative_home_routed_roaming_generic)
+        }
     }
 
     private fun collectSnapshot(context: Context, result: CheckResult): Snapshot {

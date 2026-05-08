@@ -207,16 +207,23 @@ object CdnPullingChecker {
         }.distinct()
 
         val allSuccessfulResponsesExposeIp = successfulResponses.isNotEmpty() && successfulResponses.all { it.ip != null }
-        val allActionableResponsesExposeIp = actionableResponses.isNotEmpty() && actionableResponses.all { it.ip != null }
         val hasError = successfulCount == 0
         val detected = actionableCount > 0
 
         val ipv4Conflict = actionableIpv4s.size > 1
         val ipv6Conflict = actionableIpv6s.size > 1
+        // Only raise review if we actually saw conflicting IPs across actionable
+        // targets. A single actionable target without an exposed IP is not a
+        // signal — it just means the endpoint did not advertise one. Likewise,
+        // partial successes (some endpoints failed entirely) are reported via
+        // the per-finding error path, not by flagging the whole card.
+        val ipv4MismatchAcrossAll = allIpv4s.size > 1
+        val ipv6MismatchAcrossAll = allIpv6s.size > 1
         val needsReview = detected && (
             ipv4Conflict ||
                 ipv6Conflict ||
-                !allActionableResponsesExposeIp
+                ipv4MismatchAcrossAll ||
+                ipv6MismatchAcrossAll
         )
 
         val findings = buildFindings(successfulResponses, responses)

@@ -539,10 +539,14 @@ object GeoIpChecker {
 
         val countryCode = snapshot.countryCode.uppercase().ifBlank { null }
         val outsideRu = countryCode != null && countryCode != "RU"
+        val asn = snapshot.asn.takeUnless { it.isBlank() || it == "N/A" }
         val geoFacts = GeoIpFacts(
             ip = snapshot.ip.takeUnless { it.isBlank() || it == "N/A" },
             countryCode = countryCode,
-            asn = snapshot.asn.takeUnless { it.isBlank() || it == "N/A" },
+            asn = asn,
+            asnCode = HomeNetworkCatalog.extractAsnCode(asn),
+            isp = snapshot.isp.takeUnless { it.isBlank() || it == "N/A" },
+            org = snapshot.org.takeUnless { it.isBlank() || it == "N/A" },
             outsideRu = outsideRu,
             hosting = snapshot.isHosting,
             proxyDb = snapshot.isProxy,

@@ -9,12 +9,14 @@ import com.notcvnt.rknhardering.model.BypassResult
 import com.notcvnt.rknhardering.model.CdnPullingResult
 import com.notcvnt.rknhardering.model.CategoryResult
 import com.notcvnt.rknhardering.model.CheckResult
+import com.notcvnt.rknhardering.model.EvidenceConfidence
 import com.notcvnt.rknhardering.model.EvidenceSource
 import com.notcvnt.rknhardering.model.Finding
 import com.notcvnt.rknhardering.model.GeoIpFacts
 import com.notcvnt.rknhardering.model.IpCheckerGroupResult
 import com.notcvnt.rknhardering.model.IpComparisonResult
 import com.notcvnt.rknhardering.model.IpConsensusResult
+import com.notcvnt.rknhardering.model.LocationSignalsFacts
 import com.notcvnt.rknhardering.model.Verdict
 import com.notcvnt.rknhardering.network.DnsResolverConfig
 import com.notcvnt.rknhardering.probe.TunProbeModeOverride
@@ -240,6 +242,61 @@ object VpnCheckRunner {
         )
     }
 
+    private fun annotateExpectedRoamingExit(
+        geoIp: CategoryResult,
+        locationFacts: LocationSignalsFacts?,
+    ): CategoryResult {
+        val geoFacts = geoIp.geoFacts ?: return geoIp
+        if (locationFacts == null) return geoIp
+        if (!locationFacts.homeRoutedRoaming) return geoIp
+        val mcc = locationFacts.homeSimMcc ?: return geoIp
+        val profile = HomeNetworkCatalog.lookup(mcc, locationFacts.homeSimMnc) ?: return geoIp
+        val reason = HomeNetworkCatalog.matchExpectedExit(
+            profile = profile,
+            asn = geoFacts.asn,
+            isp = geoFacts.isp,
+            org = geoFacts.org,
+        ) ?: return geoIp
+        return geoIp.copy(
+            geoFacts = geoFacts.copy(
+                expectedRoamingExit = true,
+                expectedRoamingExitReason = reason,
+            ),
+        )
+    }
+
+    private fun relaxCdnPullingForHomeRoutedRoaming(result: CdnPullingResult): CdnPullingResult {
+        // Home-routed roaming legitimately exposes a foreign IP in CDN trace
+        // responses. The original detection still records it informationally,
+        // but it must not raise needsReview when the signal is fully explained
+        // by the SIM home network.
+        if (!result.detected && !result.needsReview) return result
+        return result.copy(
+            needsReview = false,
+            findings = result.findings.map { finding ->
+                if (finding.needsReview) finding.copy(needsReview = false) else finding
+            },
+        )
+    }
+
+    private fun relaxIcmpSpoofingForHomeRoutedRoaming(result: CategoryResult): CategoryResult {
+        // The ICMP-spoofing checker assumes a Russian egress; with home-routed
+        // roaming the egress is intentionally abroad, so blocked targets that
+        // reply via ICMP cannot be treated as suspicious.
+        if (!result.needsReview && result.evidence.none { it.detected }) return result
+        return result.copy(
+            needsReview = false,
+            evidence = result.evidence.map { item ->
+                if (item.source == EvidenceSource.ICMP_SPOOFING && item.detected) {
+                    item.copy(detected = false, confidence = EvidenceConfidence.LOW)
+                } else item
+            },
+            findings = result.findings.map { finding ->
+                if (finding.needsReview) finding.copy(needsReview = false) else finding
+            },
+        )
+    }
+
     suspend fun run(
         context: Context,
         settings: CheckSettings = CheckSettings(),
@@ -447,10 +504,10 @@ object VpnCheckRunner {
             detected = false,
         )
 
-        val geoIp = geoIpReadyDeferred?.await() ?: emptyGeoIpCategory
+        val rawGeoIp = geoIpReadyDeferred?.await() ?: emptyGeoIpCategory
         val ipComparison = ipComparisonReadyDeferred?.await() ?: emptyIpComparison
-        val cdnPulling = cdnPullingReadyDeferred?.await() ?: emptyCdnPulling
-        val icmpSpoofing = icmpSpoofingReadyDeferred?.await() ?: emptyIcmpSpoofing
+        val rawCdnPulling = cdnPullingReadyDeferred?.await() ?: emptyCdnPulling
+        val rawIcmpSpoofing = icmpSpoofingReadyDeferred?.await() ?: emptyIcmpSpoofing
         val rttTriangulation = rttTriangulationReadyDeferred?.await() ?: emptyRttTriangulation
         val directSigns = directReadyDeferred.await()
         val indirectSigns = indirectReadyDeferred.await()
@@ -458,6 +515,19 @@ object VpnCheckRunner {
         val nativeSigns = nativeReadyDeferred.await()
         val bypassResult = bypassReadyDeferred?.await() ?: emptyBypass
         val tunProbeResult = tunActiveProbeDeferred?.await()
+
+        // Cross-checker reconciliation: when the SIM home network is foreign
+        // and the visited network is in Russia, the ISP-level egress will
+        // legitimately appear abroad. Try to confirm via ASN match against
+        // GeoIP to suppress false positives in CDN/ICMP/GeoIP categories.
+        val geoIp = annotateExpectedRoamingExit(rawGeoIp, locationSignals.locationFacts)
+        val homeRoutedRoaming = locationSignals.locationFacts?.homeRoutedRoaming == true
+        val cdnPulling = if (homeRoutedRoaming) {
+            relaxCdnPullingForHomeRoutedRoaming(rawCdnPulling)
+        } else rawCdnPulling
+        val icmpSpoofing = if (homeRoutedRoaming) {
+            relaxIcmpSpoofingForHomeRoutedRoaming(rawIcmpSpoofing)
+        } else rawIcmpSpoofing
 
         val ipConsensus = runCatching {
             IpConsensusBuilder.build(

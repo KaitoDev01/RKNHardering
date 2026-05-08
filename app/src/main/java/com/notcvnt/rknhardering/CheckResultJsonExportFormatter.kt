@@ -14,6 +14,7 @@ import com.notcvnt.rknhardering.model.IpCheckerGroupResult
 import com.notcvnt.rknhardering.model.IpCheckerResponse
 import com.notcvnt.rknhardering.model.IpComparisonResult
 import com.notcvnt.rknhardering.model.IpConsensusResult
+import com.notcvnt.rknhardering.model.LocationSignalsFacts
 import com.notcvnt.rknhardering.model.LocalProxyCheckResult
 import com.notcvnt.rknhardering.model.LocalProxyOwner
 import com.notcvnt.rknhardering.model.MatchedVpnApp
@@ -74,6 +75,35 @@ internal object CheckResultJsonExportFormatter {
                     },
                 )
                 put("reasons", jsonArray(narrative.reasonRows))
+                narrative.homeRoutedRoamingNote?.let { put("homeRoutedRoamingNote", it) }
+                val locationFacts = snapshot.result.locationSignals.locationFacts
+                if (locationFacts != null) {
+                    put("homeRoutedRoaming", locationFacts.homeRoutedRoaming)
+                    put(
+                        "roamingDiagnostics",
+                        JSONObject().apply {
+                            put("networkMcc", locationFacts.networkMcc)
+                            put("networkMnc", locationFacts.networkMnc)
+                            put("networkCountryIso", locationFacts.networkCountryIso)
+                            put("networkIsRussia", locationFacts.networkIsRussia)
+                            put("homeSimMcc", locationFacts.homeSimMcc)
+                            put("homeSimMnc", locationFacts.homeSimMnc)
+                            put("homeSimCountryIso", locationFacts.homeSimCountryIso)
+                            put("homeSimCountryIsRussia", locationFacts.homeSimCountryIsRussia)
+                            put("homeSimOperatorName", locationFacts.homeSimOperatorName?.let {
+                                maskExportValue(it, snapshot.privacyMode)
+                            })
+                            put("anySimReportedRoaming", locationFacts.anySimReportedRoaming)
+                            put("homeRoutedRoamingReason", locationFacts.homeRoutedRoamingReason)
+                            val expectedExit = snapshot.result.geoIp.geoFacts?.expectedRoamingExit == true
+                            put("expectedRoamingExit", expectedExit)
+                            put(
+                                "expectedRoamingExitReason",
+                                snapshot.result.geoIp.geoFacts?.expectedRoamingExitReason,
+                            )
+                        },
+                    )
+                }
             },
         )
         root.put(
@@ -111,6 +141,7 @@ internal object CheckResultJsonExportFormatter {
             put("callTransportLeaks", JSONArray().apply { category.callTransportLeaks.forEach { put(callTransportLeakToJson(it, privacyMode)) } })
             put("stunProbeGroups", JSONArray().apply { category.stunProbeGroups.forEach { put(stunProbeGroupToJson(it, privacyMode)) } })
             category.geoFacts?.let { put("geoFacts", geoFactsToJson(it, privacyMode)) }
+            category.locationFacts?.let { put("locationFacts", locationFactsToJson(it, privacyMode)) }
         }
     }
 
@@ -119,10 +150,33 @@ internal object CheckResultJsonExportFormatter {
             put("ip", maskExportIp(facts.ip, privacyMode))
             put("countryCode", facts.countryCode)
             put("asn", facts.asn?.let { maskExportValue(it, privacyMode) })
+            put("asnCode", facts.asnCode)
+            put("isp", facts.isp?.let { maskExportValue(it, privacyMode) })
+            put("org", facts.org?.let { maskExportValue(it, privacyMode) })
             put("outsideRu", facts.outsideRu)
             put("hosting", facts.hosting)
             put("proxyDb", facts.proxyDb)
             put("fetchError", facts.fetchError)
+            put("expectedRoamingExit", facts.expectedRoamingExit)
+            put("expectedRoamingExitReason", facts.expectedRoamingExitReason)
+        }
+    }
+
+    private fun locationFactsToJson(facts: LocationSignalsFacts, privacyMode: Boolean): JSONObject {
+        return JSONObject().apply {
+            put("networkMcc", facts.networkMcc)
+            put("networkMnc", facts.networkMnc)
+            put("networkCountryIso", facts.networkCountryIso)
+            put("networkOperatorName", facts.networkOperatorName?.let { maskExportValue(it, privacyMode) })
+            put("networkIsRussia", facts.networkIsRussia)
+            put("homeSimMcc", facts.homeSimMcc)
+            put("homeSimMnc", facts.homeSimMnc)
+            put("homeSimCountryIso", facts.homeSimCountryIso)
+            put("homeSimCountryIsRussia", facts.homeSimCountryIsRussia)
+            put("homeSimOperatorName", facts.homeSimOperatorName?.let { maskExportValue(it, privacyMode) })
+            put("anySimReportedRoaming", facts.anySimReportedRoaming)
+            put("homeRoutedRoaming", facts.homeRoutedRoaming)
+            put("homeRoutedRoamingReason", facts.homeRoutedRoamingReason)
         }
     }
 

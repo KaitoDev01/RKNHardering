@@ -28,6 +28,7 @@ import com.notcvnt.rknhardering.model.EvidenceConfidence
 import com.notcvnt.rknhardering.model.EvidenceItem
 import com.notcvnt.rknhardering.model.EvidenceSource
 import com.notcvnt.rknhardering.model.Finding
+import com.notcvnt.rknhardering.model.LocationSignalsFacts
 import com.notcvnt.rknhardering.network.DnsResolverConfig
 import kotlinx.coroutines.CancellableContinuation
 import kotlinx.coroutines.Dispatchers
@@ -47,6 +48,7 @@ object LocationSignalsChecker {
         val simCountryIso: String?,
         val operatorName: String?,
         val isRoaming: Boolean?,
+        val simMnc: String? = null,
     )
 
     private data class CellCollectionResult(
@@ -74,6 +76,7 @@ object LocationSignalsChecker {
         val networkCountryIso: String?,
         val networkOperatorName: String?,
         val simCards: List<SimCardInfo>,
+        val networkMnc: String? = null,
         val cellCountryCode: String?,
         val cellLookupSummary: String?,
         val cellCandidatesCount: Int,
@@ -133,6 +136,7 @@ object LocationSignalsChecker {
         val wifiFeatureAvailable = context.packageManager.hasSystemFeature(PackageManager.FEATURE_WIFI)
 
         var networkMcc: String? = null
+        var networkMnc: String? = null
         var networkCountryIso: String? = null
         var networkOperatorName: String? = null
         var cellCountryCode: String? = null
@@ -145,6 +149,8 @@ object LocationSignalsChecker {
             val networkOperator = tm.networkOperator
             if (!networkOperator.isNullOrEmpty() && networkOperator.length >= 3) {
                 networkMcc = networkOperator.substring(0, 3)
+                networkMnc = networkOperator.substring(3)
+                    .takeIf { it.isNotEmpty() }
             }
             networkCountryIso = tm.networkCountryIso?.takeIf { it.isNotEmpty() }
             networkOperatorName = tm.networkOperatorName?.takeIf { it.isNotEmpty() }
@@ -192,6 +198,7 @@ object LocationSignalsChecker {
 
         return LocationSnapshot(
             networkMcc = networkMcc,
+            networkMnc = networkMnc,
             networkCountryIso = networkCountryIso,
             networkOperatorName = networkOperatorName,
             simCards = simCards,
@@ -260,12 +267,20 @@ object LocationSignalsChecker {
                     val simMcc = if (!simOperator.isNullOrEmpty() && simOperator.length >= 3) {
                         simOperator.substring(0, 3)
                     } else null
+                    val simMnc = if (!simOperator.isNullOrEmpty() && simOperator.length > 3) {
+                        simOperator.substring(3)
+                    } else null
+                    val simCountryIso = subTm.simCountryIso?.takeIf { it.isNotEmpty() }
+                        ?: info.countryIso?.takeIf { it.isNotEmpty() }
                     SimCardInfo(
                         slotIndex = info.simSlotIndex,
                         subscriptionId = info.subscriptionId,
                         simMcc = simMcc,
-                        simCountryIso = subTm.simCountryIso?.takeIf { it.isNotEmpty() },
-                        operatorName = subTm.networkOperatorName?.takeIf { it.isNotEmpty() },
+                        simMnc = simMnc,
+                        simCountryIso = simCountryIso,
+                        operatorName = info.carrierName?.toString()?.takeIf { it.isNotEmpty() }
+                            ?: subTm.simOperatorName?.takeIf { it.isNotEmpty() }
+                            ?: subTm.networkOperatorName?.takeIf { it.isNotEmpty() },
                         isRoaming = subTm.isNetworkRoaming,
                     )
                 }.getOrNull()
@@ -278,13 +293,18 @@ object LocationSignalsChecker {
             val simMcc = if (!simOperator.isNullOrEmpty() && simOperator.length >= 3) {
                 simOperator.substring(0, 3)
             } else null
+            val simMnc = if (!simOperator.isNullOrEmpty() && simOperator.length > 3) {
+                simOperator.substring(3)
+            } else null
             listOf(
                 SimCardInfo(
                     slotIndex = 0,
                     subscriptionId = -1,
                     simMcc = simMcc,
+                    simMnc = simMnc,
                     simCountryIso = tm.simCountryIso?.takeIf { it.isNotEmpty() },
-                    operatorName = tm.networkOperatorName?.takeIf { it.isNotEmpty() },
+                    operatorName = tm.simOperatorName?.takeIf { it.isNotEmpty() }
+                        ?: tm.networkOperatorName?.takeIf { it.isNotEmpty() },
                     isRoaming = tm.isNetworkRoaming,
                 )
             )
@@ -872,11 +892,38 @@ object LocationSignalsChecker {
         val evidence = mutableListOf<EvidenceItem>()
         var needsReview = false
 
+        // Pick "home" SIM for the home-routed-roaming heuristic. Prefer the
+        // first SIM with a known MCC; fall back to the first card we have.
+        val homeSim = snapshot.simCards.firstOrNull { !it.simMcc.isNullOrBlank() }
+            ?: snapshot.simCards.firstOrNull()
+        val homeSimCountryIsRussia = homeSim?.simMcc == RUSSIA_MCC
+        val networkIsRussia = snapshot.networkMcc == RUSSIA_MCC
+        val homeRoutedRoaming = networkIsRussia &&
+            homeSim?.simMcc != null &&
+            !homeSimCountryIsRussia
+        val homeRoutedRoamingReason = if (homeRoutedRoaming && homeSim != null) {
+            val simCountry = homeSim.simCountryIso?.uppercase(Locale.US)
+                ?: countryFromMcc(homeSim.simMcc)
+                ?: "?"
+            "Home SIM MCC ${homeSim.simMcc} ($simCountry) on visited Russian network MCC ${snapshot.networkMcc}"
+        } else {
+            null
+        }
+        val anySimReportedRoaming = snapshot.simCards.any { it.isRoaming == true } ||
+            // Telephony sometimes returns isRoaming=false for foreign SIM in RU
+            // (e.g. Free Mobile in RU); fall back to MCC mismatch heuristic.
+            snapshot.simCards.any {
+                !it.simMcc.isNullOrBlank() &&
+                    !snapshot.networkMcc.isNullOrBlank() &&
+                    it.simMcc != snapshot.networkMcc
+            }
+
         if (snapshot.networkMcc == null) {
             findings += Finding("PLMN: network MCC is unavailable")
         } else {
-            val networkCountry = snapshot.networkCountryIso?.uppercase(Locale.US) ?: "N/A"
-            val networkIsRussia = snapshot.networkMcc == RUSSIA_MCC
+            val networkCountry = snapshot.networkCountryIso?.uppercase(Locale.US)
+                ?: countryFromMcc(snapshot.networkMcc)
+                ?: "N/A"
 
             findings += Finding(
                 description = "Network operator: ${snapshot.networkOperatorName ?: "N/A"} ($networkCountry)",
@@ -891,22 +938,63 @@ object LocationSignalsChecker {
             }
 
             for (sim in snapshot.simCards) {
-                val simCountry = sim.simCountryIso?.uppercase(Locale.US) ?: "N/A"
+                // Prefer simCountryIso for the SIM label — historically this
+                // was sourced from the network, mislabelling foreign SIMs as
+                // RU when registered on a Russian visited network.
+                val simCountry = sim.simCountryIso?.uppercase(Locale.US)
+                    ?: countryFromMcc(sim.simMcc)
+                    ?: "N/A"
                 val operatorPart = sim.operatorName?.let { ", $it" } ?: ""
                 findings += Finding(
                     description = "SIM[${sim.slotIndex}] MCC: ${sim.simMcc ?: "N/A"} ($simCountry)$operatorPart",
                     isInformational = true,
                 )
-                when (sim.isRoaming) {
-                    true -> findings += Finding("SIM[${sim.slotIndex}] Roaming: yes", isInformational = true)
-                    false -> findings += Finding("SIM[${sim.slotIndex}] Roaming: no", isInformational = true)
-                    null -> Unit
+                val effectiveRoaming: Boolean? = when {
+                    sim.isRoaming == true -> true
+                    !sim.simMcc.isNullOrBlank() &&
+                        !snapshot.networkMcc.isNullOrBlank() &&
+                        sim.simMcc != snapshot.networkMcc -> true
+                    sim.isRoaming == false -> false
+                    else -> null
+                }
+                val roamingLabel = when (effectiveRoaming) {
+                    true -> "yes"
+                    false -> "no"
+                    null -> null
+                }
+                if (roamingLabel != null) {
+                    findings += Finding(
+                        description = "SIM[${sim.slotIndex}] Roaming: $roamingLabel",
+                        isInformational = true,
+                    )
                 }
             }
 
+            if (homeRoutedRoaming) {
+                val description = "home_routed_roaming:true (home SIM MCC ${homeSim?.simMcc}, " +
+                    "visited network MCC ${snapshot.networkMcc})"
+                findings += Finding(
+                    description = description,
+                    source = EvidenceSource.HOME_ROUTED_ROAMING,
+                    confidence = EvidenceConfidence.MEDIUM,
+                    isInformational = false,
+                )
+                evidence += EvidenceItem(
+                    source = EvidenceSource.HOME_ROUTED_ROAMING,
+                    detected = true,
+                    confidence = EvidenceConfidence.MEDIUM,
+                    description = homeRoutedRoamingReason
+                        ?: "Foreign SIM connected via Russian visited network",
+                )
+            }
+
             if (!networkIsRussia) {
+                // Foreign visited network. If this is a Russian SIM roaming
+                // abroad (homeSimCountryIsRussia), the public IP is expected
+                // to belong to the home (Russian) operator and bypass cannot
+                // be inferred from country alone — drop confidence to LOW.
                 val matchingSim = snapshot.simCards.firstOrNull { it.simMcc == snapshot.networkMcc }
-                val confidence = if (matchingSim?.isRoaming == true) {
+                val confidence = if (matchingSim?.isRoaming == true || homeSimCountryIsRussia) {
                     EvidenceConfidence.LOW
                 } else {
                     EvidenceConfidence.MEDIUM
@@ -980,8 +1068,27 @@ object LocationSignalsChecker {
         }
 
         val detected = evidence.any {
-            it.detected && it.confidence >= EvidenceConfidence.MEDIUM
+            it.detected &&
+                it.confidence >= EvidenceConfidence.MEDIUM &&
+                it.source != EvidenceSource.HOME_ROUTED_ROAMING
         }
+
+        val locationFacts = LocationSignalsFacts(
+            networkMcc = snapshot.networkMcc,
+            networkMnc = snapshot.networkMnc,
+            networkCountryIso = snapshot.networkCountryIso?.uppercase(Locale.US),
+            networkOperatorName = snapshot.networkOperatorName,
+            networkIsRussia = networkIsRussia,
+            homeSimMcc = homeSim?.simMcc,
+            homeSimMnc = homeSim?.simMnc,
+            homeSimCountryIso = homeSim?.simCountryIso?.uppercase(Locale.US)
+                ?: countryFromMcc(homeSim?.simMcc),
+            homeSimCountryIsRussia = homeSimCountryIsRussia,
+            homeSimOperatorName = homeSim?.operatorName,
+            anySimReportedRoaming = anySimReportedRoaming,
+            homeRoutedRoaming = homeRoutedRoaming,
+            homeRoutedRoamingReason = homeRoutedRoamingReason,
+        )
 
         val result = CategoryResult(
             name = "Location signals",
@@ -989,6 +1096,7 @@ object LocationSignalsChecker {
             findings = findings,
             needsReview = needsReview,
             evidence = evidence,
+            locationFacts = locationFacts,
         )
         return LocationSignalsDiagnosticsRegistry.attach(
             result,
@@ -1016,4 +1124,75 @@ object LocationSignalsChecker {
     }
 
     private val MAC_ADDRESS_REGEX = Regex("^[0-9a-f]{2}(?::[0-9a-f]{2}){5}$")
+
+    /**
+     * Lightweight MCC → ISO 3166-1 alpha-2 lookup for the most common
+     * countries. Used to label SIM/Network country when telephony APIs
+     * return blank simCountryIso (typical when SIM-MCC and Network-MCC
+     * disagree). Not exhaustive — falls back to null.
+     */
+    private fun countryFromMcc(mcc: String?): String? {
+        if (mcc.isNullOrBlank()) return null
+        return MCC_TO_ISO[mcc]
+    }
+
+    private val MCC_TO_ISO: Map<String, String> = mapOf(
+        "202" to "GR", "204" to "NL", "206" to "BE", "208" to "FR",
+        "212" to "MC", "213" to "AD", "214" to "ES", "216" to "HU",
+        "218" to "BA", "219" to "HR", "220" to "RS", "222" to "IT",
+        "226" to "RO", "228" to "CH", "230" to "CZ", "231" to "SK",
+        "232" to "AT", "234" to "GB", "235" to "GB", "238" to "DK",
+        "240" to "SE", "242" to "NO", "244" to "FI", "246" to "LT",
+        "247" to "LV", "248" to "EE", "250" to "RU", "255" to "UA",
+        "257" to "BY", "259" to "MD", "260" to "PL", "262" to "DE",
+        "266" to "GI", "268" to "PT", "270" to "LU", "272" to "IE",
+        "274" to "IS", "276" to "AL", "278" to "MT", "280" to "CY",
+        "282" to "GE", "283" to "AM", "284" to "BG", "286" to "TR",
+        "288" to "FO", "290" to "GL", "293" to "SI", "294" to "MK",
+        "295" to "LI", "297" to "ME", "310" to "US", "311" to "US",
+        "312" to "US", "313" to "US", "314" to "US", "315" to "US",
+        "316" to "US", "330" to "PR", "334" to "MX", "338" to "JM",
+        "340" to "MQ", "342" to "BB", "346" to "KY", "348" to "VG",
+        "350" to "BM", "352" to "GD", "354" to "MS", "356" to "KN",
+        "358" to "LC", "360" to "VC", "362" to "AN", "363" to "AW",
+        "364" to "BS", "365" to "AI", "366" to "DM", "368" to "CU",
+        "370" to "DO", "372" to "HT", "374" to "TT", "376" to "TC",
+        "400" to "AZ", "401" to "KZ", "402" to "BT", "404" to "IN",
+        "405" to "IN", "410" to "PK", "412" to "AF", "413" to "LK",
+        "414" to "MM", "415" to "LB", "416" to "JO", "417" to "SY",
+        "418" to "IQ", "419" to "KW", "420" to "SA", "421" to "YE",
+        "422" to "OM", "424" to "AE", "425" to "IL", "426" to "BH",
+        "427" to "QA", "428" to "MN", "429" to "NP", "430" to "AE",
+        "431" to "AE", "432" to "IR", "434" to "UZ", "436" to "TJ",
+        "437" to "KG", "438" to "TM", "440" to "JP", "441" to "JP",
+        "450" to "KR", "452" to "VN", "454" to "HK", "455" to "MO",
+        "456" to "KH", "457" to "LA", "460" to "CN", "461" to "CN",
+        "466" to "TW", "467" to "KP", "470" to "BD", "472" to "MV",
+        "502" to "MY", "505" to "AU", "510" to "ID", "514" to "TL",
+        "515" to "PH", "520" to "TH", "525" to "SG", "528" to "BN",
+        "530" to "NZ", "534" to "MP", "535" to "GU", "536" to "NR",
+        "537" to "PG", "539" to "TO", "540" to "SB", "541" to "VU",
+        "542" to "FJ", "543" to "WF", "544" to "AS", "545" to "KI",
+        "546" to "NC", "547" to "PF", "548" to "CK", "549" to "WS",
+        "550" to "FM", "551" to "MH", "552" to "PW", "602" to "EG",
+        "603" to "DZ", "604" to "MA", "605" to "TN", "606" to "LY",
+        "607" to "GM", "608" to "SN", "609" to "MR", "610" to "ML",
+        "611" to "GN", "612" to "CI", "613" to "BF", "614" to "NE",
+        "615" to "TG", "616" to "BJ", "617" to "MU", "618" to "LR",
+        "619" to "SL", "620" to "GH", "621" to "NG", "622" to "TD",
+        "623" to "CF", "624" to "CM", "625" to "CV", "626" to "ST",
+        "627" to "GQ", "628" to "GA", "629" to "CG", "630" to "CD",
+        "631" to "AO", "632" to "GW", "633" to "SC", "634" to "SD",
+        "635" to "RW", "636" to "ET", "637" to "SO", "638" to "DJ",
+        "639" to "KE", "640" to "TZ", "641" to "UG", "642" to "BI",
+        "643" to "MZ", "645" to "ZM", "646" to "MG", "647" to "RE",
+        "648" to "ZW", "649" to "NA", "650" to "MW", "651" to "LS",
+        "652" to "BW", "653" to "SZ", "654" to "KM", "655" to "ZA",
+        "657" to "ER", "659" to "SS", "702" to "BZ", "704" to "GT",
+        "706" to "SV", "708" to "HN", "710" to "NI", "712" to "CR",
+        "714" to "PA", "716" to "PE", "722" to "AR", "724" to "BR",
+        "730" to "CL", "732" to "CO", "734" to "VE", "736" to "BO",
+        "738" to "GY", "740" to "EC", "744" to "PY", "746" to "SR",
+        "748" to "UY",
+    )
 }

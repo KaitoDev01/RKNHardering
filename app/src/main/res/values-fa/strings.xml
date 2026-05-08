@@ -351,6 +351,12 @@
     <string name="narrative_reason_fallback_review">نشانه‌ها ناقص یا متناقض‌اند، بنابراین بررسی دستی لازم است.</string>
     <string name="narrative_reason_fallback_clean">هیچ نشانه تعیین‌کننده‌ای از دور زدن پیدا نشد.</string>
 
+    <string name="narrative_home_routed_roaming_confirmed">یک سیم‌کارت خارجی (%1$s، %2$s) از طریق شبکه میزبان روسیه متصل است. آی‌پی عمومی متعلق به ASN اپراتور خانگی است؛ این یک رومینگ معمول از مسیر خانگی است و نه دور زدن.</string>
+    <string name="narrative_home_routed_roaming_confirmed_country">یک سیم‌کارت خارجی (%1$s) از طریق شبکه میزبان روسیه متصل است. آی‌پی عمومی متعلق به ASN اپراتور خانگی است؛ این یک رومینگ معمول از مسیر خانگی است و نه دور زدن.</string>
+    <string name="narrative_home_routed_roaming_likely">یک سیم‌کارت خارجی (%1$s، %2$s) از طریق شبکه میزبان روسیه متصل است. به‌احتمال زیاد جلسه داده در کشور خانگی خروج پیدا می‌کند؛ این سناریوی مشروع شبیه دور زدن به نظر می‌رسد.</string>
+    <string name="narrative_home_routed_roaming_likely_country">یک سیم‌کارت خارجی (%1$s) از طریق شبکه میزبان روسیه متصل است. به‌احتمال زیاد جلسه داده در کشور خانگی خروج پیدا می‌کند؛ این سناریوی مشروع شبیه دور زدن به نظر می‌رسد.</string>
+    <string name="narrative_home_routed_roaming_generic">یک سیم‌کارت خارجی از طریق شبکه میزبان روسیه متصل است. ممکن است جلسه داده به‌طور قانونی در خارج خروج پیدا کند (رومینگ از مسیر خانگی).</string>
+
     <string name="checker_yes">بله</string>
     <string name="checker_no">خیر</string>
     <string name="checker_proxy_owner_suffix"> (مالک: %1$s)</string>

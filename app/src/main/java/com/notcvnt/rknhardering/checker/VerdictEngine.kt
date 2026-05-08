@@ -77,14 +77,19 @@ object VerdictEngine {
                 it.description.contains("cell_country_ru:true") ||
                 it.description.contains("location_country_ru:true")
         }
+        val homeRoutedRoaming = locationSignals.locationFacts?.homeRoutedRoaming == true
         val geo = geoIp.geoFacts
+        // Home-routed roaming: foreign SIM on a Russian visited network
+        // legitimately exits via the SIM's home country. Treat the resulting
+        // geo mismatch as expected and never auto-detect bypass on geo alone.
+        val expectedRoamingExit = geo?.expectedRoamingExit == true || homeRoutedRoaming
         val geoAxisAvailable = geoCheckAvailable && geo?.fetchError != true
         val anyOtherSignal = directSigns.evidence.any { it.detected } ||
             indirectSigns.evidence.any { it.detected } ||
             ipConsensus.crossChannelMismatch ||
             ipConsensus.probeTargetDivergence ||
             ipConsensus.probeTargetDirectDivergence
-        if (locationConfirmsRussia && geo?.outsideRu == true) {
+        if (locationConfirmsRussia && geo?.outsideRu == true && !expectedRoamingExit) {
             return Verdict.DETECTED
         }
         if (locationConfirmsRussia &&
@@ -96,7 +101,7 @@ object VerdictEngine {
         }
 
         // R5 — 3-bit matrix (geo x direct x indirect)
-        val geoHit = geo?.outsideRu == true
+        val geoHit = geo?.outsideRu == true && !expectedRoamingExit
         val directHit = directSigns.evidence.any { it.detected && it.source in MATRIX_DIRECT_SOURCES }
         val indirectHit = indirectSigns.evidence.any { it.detected && it.source in MATRIX_INDIRECT_SOURCES } ||
             nativeSigns.evidence.any { it.detected && it.source in MATRIX_INDIRECT_SOURCES }
@@ -122,7 +127,7 @@ object VerdictEngine {
         val tunProbeReview = directSigns.evidence.any {
             it.source == EvidenceSource.TUN_ACTIVE_PROBE && !it.detected
         }
-        val locationSignalHit = locationSignals.detected
+        val locationSignalHit = locationSignals.detected && !expectedRoamingExit
         if (matrix == Verdict.NOT_DETECTED && (
                 bypassResult.needsReview ||
                     directSigns.needsReview ||

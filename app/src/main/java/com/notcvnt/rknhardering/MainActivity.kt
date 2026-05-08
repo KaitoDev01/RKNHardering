@@ -273,6 +273,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var iconVerdict: ImageView
     private lateinit var textVerdict: TextView
     private lateinit var textVerdictExplanation: TextView
+    private lateinit var textVerdictHomeRoutedRoamingNote: TextView
     private lateinit var btnVerdictDetails: MaterialButton
     private lateinit var verdictDetailsDivider: View
     private lateinit var verdictDetailsContent: LinearLayout
@@ -522,6 +523,7 @@ class MainActivity : AppCompatActivity() {
         iconVerdict = findViewById(R.id.iconVerdict)
         textVerdict = findViewById(R.id.textVerdict)
         textVerdictExplanation = findViewById(R.id.textVerdictExplanation)
+        textVerdictHomeRoutedRoamingNote = findViewById(R.id.textVerdictHomeRoutedRoamingNote)
         btnVerdictDetails = findViewById(R.id.btnVerdictDetails)
         verdictDetailsDivider = findViewById(R.id.verdictDetailsDivider)
         verdictDetailsContent = findViewById(R.id.verdictDetailsContent)
@@ -3019,6 +3021,19 @@ class MainActivity : AppCompatActivity() {
         textVerdictExplanation.text = narrative.explanation
         textVerdictExplanation.visibility = View.VISIBLE
 
+        val note = narrative.homeRoutedRoamingNote
+        if (note != null) {
+            textVerdictHomeRoutedRoamingNote.text = note
+            textVerdictHomeRoutedRoamingNote.visibility = View.VISIBLE
+            textVerdictHomeRoutedRoamingNote.setTextColor(onSurfaceColor())
+            textVerdictHomeRoutedRoamingNote.setBackgroundResource(
+                R.drawable.bg_verdict_home_routed_roaming_note,
+            )
+        } else {
+            textVerdictHomeRoutedRoamingNote.text = ""
+            textVerdictHomeRoutedRoamingNote.visibility = View.GONE
+        }
+
         verdictDetailsContent.removeAllViews()
         addVerdictSection(
             title = getString(R.string.main_verdict_section_meaning),
@@ -3111,6 +3126,8 @@ class MainActivity : AppCompatActivity() {
         textVerdict.text = ""
         textVerdictExplanation.text = ""
         textVerdictExplanation.visibility = View.GONE
+        textVerdictHomeRoutedRoamingNote.text = ""
+        textVerdictHomeRoutedRoamingNote.visibility = View.GONE
         verdictDetailsDivider.visibility = View.GONE
         btnVerdictDetails.visibility = View.GONE
         btnVerdictDetails.text = getString(R.string.main_verdict_details)
